@@ -17,7 +17,7 @@
             android:id="@+id/back_arrow"
             android:layout_width="@dimen/icon_margin"
             android:layout_height="@dimen/icon_margin"
-            android:src="@drawable/back_vector"/>
+            android:src="@drawable/ic_back_vector_16"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="24dp"
         android:paddingTop="@dimen/padding"
         android:paddingStart="@dimen/icon_margin"
         android:paddingVertical="@dimen/icon_margin">
@@ -73,7 +73,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/share_vector"
+            android:src="@drawable/ic_share_vector"
             />
     </LinearLayout>
     <LinearLayout
@@ -96,7 +96,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/group_vector" />
+            android:src="@drawable/ic_group_vector" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -118,7 +118,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/arrow_vector"
+            android:src="@drawable/ic_arrow_24"
             />
     </LinearLayout>
 

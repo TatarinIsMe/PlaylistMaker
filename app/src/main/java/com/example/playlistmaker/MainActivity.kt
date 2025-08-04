@@ -20,12 +20,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val butSettings = findViewById<Button>(R.id.settings)
         but.setOnClickListener(this@MainActivity)
         butMedia.setOnClickListener {
-//            Toast.makeText(this@MainActivity, "Нажали на кнопку!", Toast.LENGTH_SHORT).show()
             val displayIntent = Intent(this, MediaActivity::class.java)
             startActivity(displayIntent)
         }
         butSettings.setOnClickListener {
-//            Toast.makeText(this@MainActivity, "Нажали на кнопку!", Toast.LENGTH_SHORT).show()
             val displayIntent = Intent(this, SettingsActivity::class.java)
             startActivity(displayIntent)
         }
