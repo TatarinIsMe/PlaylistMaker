@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+        <color name="colorBackground">#FFFFFF</color>
+        <color name="colorOnBackground">#1B1B1F</color>
+
+        <color name="colorSurface">#E6E8EB</color>
+        <color name="colorOnSurface">#1B1B1F</color>
+
+        <color name="colorOnSurfaceVariant">#6D6D71</color>
+        <color name="colorOutline">#DADCE0</color>
 </resources>
