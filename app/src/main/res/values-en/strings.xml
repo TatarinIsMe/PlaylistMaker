@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Playlist Maker</string>
+    <string name="title_hello">Hello, Praktikum</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_media">Media</string>
+    <string name="title_search">Search</string>
+    <string name="black_theame">Dark mode</string>
+    <string name="share_app">Share app</string>
+    <string name="write_support">Contact support</string>
+    <string name="agree_licence">User Agreement</string>
+    <string name="share_message">I recommend the Android development course at Praktikum: https://practicum.yandex.ru/android/</string>
+    <string name="support_subject">Message to the developers of the Playlist Maker app</string>
+    <string name="support_body">Thanks to the developers for a cool app!</string>
+    <string name="search_title">Search</string>
+    <string name="search_hint">Search</string>
+    <string name="content_desc_back">Back</string>
+    <string name="content_desc_clear">Clear</string>
+</resources>

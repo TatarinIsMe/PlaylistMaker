@@ -10,11 +10,24 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PlaylistMaker"
+        android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".SearchActivity"
+            android:exported="false"
+            android:theme="@style/Test.Theme.PlaylistMaker"/>
+        <activity
+            android:name=".MediaActivity"
+            android:exported="false"
+            />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Test.Theme.PlaylistMaker"/>
+        <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Main.Theme.PlaylistMaker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

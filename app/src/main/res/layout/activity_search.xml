@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:theme="@style/Test.Theme.PlaylistMaker">
+<!--    android:fitsSystemWindows="true"-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/lauout_padding">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:src="@drawable/ic_back_vector_16"
+            app:tint="?attr/colorOnBackground"
+            android:contentDescription="@string/content_desc_back"
+            android:layout_margin="@dimen/padding_edittext"
+            android:padding="@dimen/lauout_padding"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search_title"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="@dimen/text_size"
+            android:paddingStart="@dimen/padding_edittext"
+            android:paddingBottom="@dimen/padding_edittext"
+            android:paddingTop="10dp"
+            android:fontFamily="@font/ys_display_medium"/>
+    </LinearLayout>
+
+
+
+        <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_search_field"
+            android:layout_marginStart="@dimen/icon_margin"
+            android:layout_marginEnd="@dimen/icon_margin"
+            android:layout_marginTop="@dimen/margin_horizontal"
+            android:layout_marginBottom="@dimen/margin_horizontal"
+        android:hint="@string/search_hint"
+        android:paddingStart="36dp"
+            android:paddingEnd="30dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:includeFontPadding="false"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant"/>
+
+
+        <ImageView
+            android:layout_width="@dimen/ic_search_margin"
+            android:layout_height="@dimen/icon_margin"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="@dimen/ic_search_margin"
+            android:layout_marginBottom="@dimen/ic_search_margin"
+            android:src="@drawable/ic_search_vector"
+            android:contentDescription="@null"
+            app:tint="?attr/colorOnSurfaceVariant"/>
+        <ImageButton
+            android:id="@+id/btnClear"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="20dp"
+
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_cancel_24"
+            android:contentDescription="@string/content_desc_clear"
+            android:visibility="gone"
+            app:tint="?attr/colorOnSurfaceVariant"/>
+
+    </FrameLayout>
+</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

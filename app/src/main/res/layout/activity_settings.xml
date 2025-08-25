@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    style="@style/Test.Theme.PlaylistMaker">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="@dimen/icon_margin"
+        android:paddingTop="14dp"
+        android:paddingStart="@dimen/icon_margin">
+
+
+        <ImageView
+            android:id="@+id/back_arrow"
+            android:layout_width="@dimen/icon_margin"
+            android:layout_height="@dimen/icon_margin"
+            app:tint="?attr/colorOnBackground"
+            android:src="@drawable/ic_back_vector_16"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_settings"
+            android:layout_marginStart="12dp"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="@dimen/text_size"
+            android:paddingStart="12dp"
+            android:fontFamily="@font/ys_display_medium"/>
+    </LinearLayout>
+    <LinearLayout
+        style="@style/settings_liner"
+        android:layout_marginTop="24dp"
+        android:paddingTop="@dimen/padding"
+        android:paddingStart="@dimen/icon_margin"
+        android:paddingVertical="@dimen/icon_margin">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/black_theame"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="@dimen/text_size_settings"
+            android:fontFamily="@font/ys_display_regular"/>
+
+        <Switch
+            android:id="@+id/dark_theme_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/share_layout"
+        style="@style/settings_liner"
+        android:paddingVertical="@dimen/padding"
+        android:paddingHorizontal="@dimen/icon_margin">
+
+        <TextView
+            style="@style/settings_text"
+            android:text="@string/share_app" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_share_vector"
+            app:tint="?attr/colorOnSurfaceInverse"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/support_layout"
+        style="@style/settings_liner"
+        android:paddingVertical="@dimen/padding"
+        android:paddingHorizontal="@dimen/icon_margin">
+
+        <TextView
+            style="@style/settings_text"
+            android:text="@string/write_support" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_group_vector"
+            app:tint="?attr/colorOnSurfaceInverse"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/licence_layout"
+        style="@style/settings_liner"
+        android:paddingVertical="@dimen/padding"
+        android:paddingHorizontal="@dimen/icon_margin">
+
+        <TextView
+            style="@style/settings_text"
+            android:text="@string/agree_licence" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_24"
+            app:tint="?attr/colorOnSurfaceInverse"/>
+    </LinearLayout>
+
+</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
