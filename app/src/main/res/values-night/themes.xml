@@ -8,10 +8,11 @@
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="colorOnSurfaceVariant">@color/colorBackground</item>
         <item name="colorOutline">@color/colorOutline</item>
+        <item name="colorOnSurfaceInverse">@color/colorOnSurfaceInverse</item>
 
         <item name="android:statusBarColor">@color/colorBackground</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="colorControlActivated">@color/colorOnPrimary</item>
+        <item name="colorControlActivated">@color/colorControlActivated</item>
     </style>
     <style name="Main.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorOnPrimary">@color/colorOnPrimary</item>

@@ -11,6 +11,7 @@
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
         <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
+        <item name="colorOnSurfaceInverse">@color/colorOnSurfaceInverse</item>
         <item name="colorOutline">@color/colorOutline</item>
 
         <item name="android:statusBarColor">@color/colorBackground</item>
