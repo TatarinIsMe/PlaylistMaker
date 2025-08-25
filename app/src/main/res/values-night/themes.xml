@@ -6,10 +6,14 @@
 
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
-        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/colorBackground</item>
         <item name="colorOutline">@color/colorOutline</item>
 
         <item name="android:statusBarColor">@color/colorBackground</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="colorControlActivated">@color/colorOnPrimary</item>
+    </style>
+    <style name="Main.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
     </style>
 </resources>

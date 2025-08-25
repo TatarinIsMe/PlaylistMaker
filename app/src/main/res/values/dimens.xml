@@ -7,4 +7,8 @@
     <dimen name="padding">21sp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="padding_edittext">12dp</dimen>
+    <dimen name="lauout_padding">4dp</dimen>
+    <dimen name="ic_search_margin">18dp</dimen>
+    <dimen name="margin_horizontal">8dp</dimen>
+
 </resources>

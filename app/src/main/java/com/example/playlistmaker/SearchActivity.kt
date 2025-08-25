@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+const val  KEY = "key_search_query"
 class SearchActivity : AppCompatActivity() {
     private lateinit var etSearch: EditText
     private lateinit var btnClear: ImageButton
@@ -21,15 +22,17 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var ivBack: ImageView
     private var currentQuery: String = ""
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_search)
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-//            insets
-//        }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         etSearch = findViewById(R.id.etSearch)
         btnClear = findViewById(R.id.btnClear)
@@ -58,13 +61,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("key_search_query", currentQuery)
+        outState.putString(KEY, currentQuery)
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        currentQuery = savedInstanceState.getString("key_search_query").orEmpty()
+        currentQuery = savedInstanceState.getString(KEY).orEmpty()
         etSearch.setText(currentQuery)
         etSearch.setSelection(currentQuery.length)
         btnClear.visibility = if (currentQuery.isEmpty()) View.GONE else View.VISIBLE
