@@ -21,7 +21,6 @@ class TrackAdapter(
     fun submitList(newItems: List<Track>) {
         items.clear()
         items.addAll(newItems)
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
