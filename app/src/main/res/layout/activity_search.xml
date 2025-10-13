@@ -95,5 +95,12 @@
             app:tint="?attr/colorOnSurfaceVariant"/>
 
     </FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTracks"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/list_top_padding"
+        tools:listitem="@layout/item_track" />
 </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,4 +17,7 @@
     <style name="Main.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
     </style>
+    <style name="Test.Theme.PlaylistMaker.Search" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorOnSurfaceVariant">@color/colorSurface</item>
+    </style>
 </resources>
