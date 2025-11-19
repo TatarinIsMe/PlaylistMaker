@@ -18,7 +18,6 @@
         android:layout_height="@dimen/image_size"
         android:scaleType="centerCrop"
         app:shapeAppearanceOverlay="@style/Shape.SmallRounded" />
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -26,6 +25,7 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
+        <!-- Название трека -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
@@ -34,13 +34,40 @@
             android:maxLines="1"
             android:ellipsize="end" />
 
-        <TextView
-            android:id="@+id/tvSubtitle"
-            android:layout_width="match_parent"
+        <!-- Строка: артист • время -->
+        <LinearLayout
+            android:id="@+id/llBottomRow"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/TrackSubtitle"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TrackSubtitle"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        <!-- Точка-разделитель -->
+            <TextView
+                android:id="@+id/tvDot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="•"
+                style="@style/TrackSubtitle"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <!-- Время -->
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TrackSubtitle"
+                android:maxLines="1" />
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView

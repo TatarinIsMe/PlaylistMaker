@@ -95,12 +95,83 @@
             app:tint="?attr/colorOnSurfaceVariant"/>
 
     </FrameLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTracks"
+    <FrameLayout
+        android:id="@+id/flContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:paddingTop="@dimen/list_top_padding">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:paddingTop="@dimen/list_top_padding"
         tools:listitem="@layout/item_track" />
+    <!-- Заглушка: ничего не найдено -->
+    <LinearLayout
+        android:id="@+id/llEmptyPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search_nothig_light_120"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ничего не нашлось"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnBackground"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+    <!-- Заглушка: проблемы со связью -->
+    <LinearLayout
+        android:id="@+id/llErrorPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search_error_light_120"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Проблемы со связью"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnBackground"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Загрузка не удалась. Проверьте подключение к интернету"
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnBackground"
+            android:gravity="center"
+            android:layout_marginTop="6dp"/>
+
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Обновить"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
