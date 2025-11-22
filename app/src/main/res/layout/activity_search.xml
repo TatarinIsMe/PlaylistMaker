@@ -120,16 +120,17 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_search_nothig_light_120"
+            android:src="@drawable/ic_search_nothing_120"
             android:contentDescription="@null" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ничего не нашлось"
+            android:text="@string/error_nothing_text"
             android:textSize="16sp"
             android:textColor="?attr/colorOnBackground"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/ys_display_medium"/>
     </LinearLayout>
     <!-- Заглушка: проблемы со связью -->
     <LinearLayout
@@ -143,34 +144,37 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_search_error_light_120"
+            android:src="@drawable/ic_search_error_120"
             android:contentDescription="@null" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Проблемы со связью"
+            android:text="@string/error_connection_title"
             android:textSize="16sp"
             android:textColor="?attr/colorOnBackground"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/ys_display_medium"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Загрузка не удалась. Проверьте подключение к интернету"
+            android:text="@string/error_connection_text"
             android:textSize="14sp"
             android:textColor="?attr/colorOnBackground"
             android:gravity="center"
-            android:layout_marginTop="6dp"/>
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/ys_display_medium"/>
 
         <Button
             android:id="@+id/btnRetry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Обновить"
+            android:text="@string/reload"
             android:layout_marginTop="16dp"
-            android:backgroundTint="?attr/colorPrimary"
-            android:textColor="@android:color/white" />
+            android:backgroundTint="?attr/colorOnBackground"
+            android:textColor="@color/colorBackground"
+            android:fontFamily="@font/ys_display_medium"/>
     </LinearLayout>
     </FrameLayout>
 </LinearLayout>
