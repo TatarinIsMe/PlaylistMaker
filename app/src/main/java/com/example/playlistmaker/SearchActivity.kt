@@ -29,6 +29,8 @@ import java.util.Locale
 
 const val  KEY = "key_search_query"
 class SearchActivity : AppCompatActivity() {
+    private lateinit var flContent: View
+
     private lateinit var etSearch: EditText
     private lateinit var btnClear: ImageButton
 
@@ -36,12 +38,24 @@ class SearchActivity : AppCompatActivity() {
     private var currentQuery: String = ""
 
     private lateinit var rvTracks: RecyclerView
-    private val adapter by lazy { TrackAdapter() }
 
     private lateinit var llEmptyPlaceholder: View
     private lateinit var llErrorPlaceholder: View
     private lateinit var btnRetry: Button
     private var lastFailedQuery: String = ""
+
+    private lateinit var llHistory: View
+    private lateinit var rvHistory: RecyclerView
+    private lateinit var btnClearHistory: Button
+
+    private lateinit var historyAdapter: TrackAdapter
+    private lateinit var searchHistory: SearchHistory
+
+    private val adapter by lazy {
+        TrackAdapter(onItemClick = { track -> onTrackClicked(track) })
+    }
+
+
 
 
 
@@ -56,6 +70,20 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        val sharedPrefs = getSharedPreferences("playlist_maker_prefs", MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+
+        flContent = findViewById(R.id.flContent)
+
+        llHistory = findViewById(R.id.llHistory)
+        rvHistory = findViewById(R.id.rvHistory)
+        btnClearHistory = findViewById(R.id.btnClearHistory)
+
+        historyAdapter = TrackAdapter()
+        rvHistory.layoutManager = LinearLayoutManager(this)
+        rvHistory.adapter = historyAdapter
+
+
 
         etSearch = findViewById(R.id.etSearch)
         btnClear = findViewById(R.id.btnClear)
@@ -67,6 +95,15 @@ class SearchActivity : AppCompatActivity() {
         llErrorPlaceholder = findViewById<View>(R.id.llErrorPlaceholder)
         btnRetry = findViewById<Button>(R.id.btnRetry)
 
+        etSearch.setOnFocusChangeListener { _, _ ->
+            updateHistoryVisibility()
+        }
+        btnClearHistory.setOnClickListener {
+            searchHistory.clear()
+            llHistory.visibility = View.GONE
+            historyAdapter.submitList(emptyList())
+        }
+
 
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -74,6 +111,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 currentQuery = s?.toString().orEmpty()
                 btnClear.visibility = if (!s.isNullOrEmpty()) View.VISIBLE else View.GONE
+                updateHistoryVisibility()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -113,6 +151,9 @@ class SearchActivity : AppCompatActivity() {
     private fun performSearch(query: String) {
         hideKeyboard()
         lastFailedQuery = query
+
+        showSearchResults()
+
         rvTracks.visibility = View.GONE
         llEmptyPlaceholder.visibility = View.GONE
         llErrorPlaceholder.visibility = View.GONE
@@ -148,6 +189,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showTracks(tracks: List<Track>) {
+        showSearchResults()
+
         adapter.submitList(tracks)
         rvTracks.visibility = View.VISIBLE
         llEmptyPlaceholder.visibility = View.GONE
@@ -155,6 +198,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showEmptyPlaceholder() {
+        showSearchResults()
+
         adapter.submitList(emptyList())
         rvTracks.visibility = View.GONE
         llEmptyPlaceholder.visibility = View.VISIBLE
@@ -162,6 +207,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showErrorPlaceholder() {
+        showSearchResults()
+
         adapter.submitList(emptyList())
         rvTracks.visibility = View.GONE
         llEmptyPlaceholder.visibility = View.GONE
@@ -193,11 +240,39 @@ class SearchActivity : AppCompatActivity() {
         val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault())
             .format(trackTimeMillis ?: 0L)
         return Track(
+            trackId = trackId ?: 0L,
             trackName = trackName.orEmpty(),
             artistName = artistName.orEmpty(),
             trackTime = formattedTime,
             artworkUrl100 = artworkUrl100
         )
     }
+
+    private fun updateHistoryVisibility() {
+        val hasFocus = etSearch.hasFocus()
+        val textEmpty = etSearch.text.isNullOrEmpty()
+        val history = searchHistory.getHistory()
+
+        if (hasFocus && textEmpty && history.isNotEmpty()) {
+            historyAdapter.submitList(history)
+            showHistory()
+        } else {
+            llHistory.visibility = View.GONE
+        }
+    }
+    private fun onTrackClicked(track: Track) {
+        searchHistory.addTrack(track)
+    }
+    private fun showHistory() {
+        llHistory.visibility = View.VISIBLE
+        flContent.visibility = View.GONE
+    }
+
+    private fun showSearchResults() {
+        llHistory.visibility = View.GONE
+        flContent.visibility = View.VISIBLE
+    }
+
+
 
 }

@@ -16,7 +16,8 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.color.MaterialColors
 
 class TrackAdapter(
-    private val items: MutableList<Track> = mutableListOf()
+    private val items: MutableList<Track> = mutableListOf(),
+            private val onItemClick: ((Track) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     fun submitList(newItems: List<Track>) {
@@ -33,8 +34,10 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        Log.d("TrackAdapter", "bind position = $position")
         holder.bind(items[position], position)
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(items[position])
+        }
     }
 
     override fun getItemCount(): Int = items.size

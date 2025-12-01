@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.LinearLayout
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +49,10 @@ class SettingsActivity : AppCompatActivity() {
         licenceLayout.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.licence_url)))
             startActivity(browserIntent)
+        }
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
         }
 
     }

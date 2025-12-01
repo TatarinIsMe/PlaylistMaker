@@ -22,4 +22,7 @@
     <string name="search_hint">Поиск</string>
     <string name="content_desc_back">Назад</string>
     <string name="content_desc_clear">Очистить запрос</string>
+
+    <string name="history_title" translatable="false">Вы искали</string>
+    <string name="clear_history" translatable="false">Очистить историю</string>
 </resources>
