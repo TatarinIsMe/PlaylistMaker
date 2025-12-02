@@ -21,7 +21,6 @@ class TrackAdapter(
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     fun submitList(newItems: List<Track>) {
-        Log.d("TrackAdapter", "submitList size = ${newItems.size}")
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()

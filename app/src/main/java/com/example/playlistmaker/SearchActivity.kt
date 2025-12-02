@@ -26,8 +26,6 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
-const val  KEY = "key_search_query"
 class SearchActivity : AppCompatActivity() {
     private lateinit var flContent: View
 
@@ -177,7 +175,6 @@ class SearchActivity : AppCompatActivity() {
                     if (tracks.isEmpty()) {
                         showEmptyPlaceholder()
                     } else {
-                        Log.d("musics", tracks[1].trackName)
                         showTracks(tracks)
                     }
                 }
@@ -233,9 +230,6 @@ class SearchActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(it, 0)
         }
     }
-    companion object {
-        private const val KEY_QUERY = "SEARCH_QUERY_KEY"
-    }
     private fun TrackDto.toTrack(): Track {
         val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault())
             .format(trackTimeMillis ?: 0L)
@@ -271,6 +265,9 @@ class SearchActivity : AppCompatActivity() {
     private fun showSearchResults() {
         llHistory.visibility = View.GONE
         flContent.visibility = View.VISIBLE
+    }
+    companion object {
+        private const val KEY = "key_search_query"
     }
 
 

@@ -14,13 +14,13 @@ class SearchHistory(
 
     private val gson = Gson()
 
-    fun getHistory(): MutableList<Track> {
-        val json = sharedPrefs.getString(KEY_HISTORY, null) ?: return mutableListOf()
+    fun getHistory(): List<Track> {
+        val json = sharedPrefs.getString(KEY_HISTORY, null) ?: return emptyList()
         return try {
-            val type = object : TypeToken<MutableList<Track>>() {}.type
-            gson.fromJson(json, type) ?: mutableListOf()
+            val type = object : TypeToken<List<Track>>() {}.type
+            gson.fromJson(json, type) ?: emptyList()
         } catch (e: Exception) {
-            mutableListOf()
+            emptyList()
         }
     }
 
@@ -32,20 +32,14 @@ class SearchHistory(
     }
 
     fun addTrack(track: Track) {
-        val history = getHistory()
-
-        // удаляем, если такой уже есть
-        history.removeAll { it.trackId == track.trackId }
-
-        // добавляем в начало
-        history.add(0, track)
-
-        // обрезаем до 10
-        if (history.size > MAX_SIZE) {
-            history.subList(MAX_SIZE, history.size).clear()
+        val mutableHistory = getHistory().toMutableList()
+        mutableHistory.removeAll { it.trackId == track.trackId }
+        mutableHistory.add(0, track)
+        if (mutableHistory.size > MAX_SIZE) {
+            mutableHistory.subList(MAX_SIZE, mutableHistory.size).clear()
         }
 
-        saveHistory(history)
+        saveHistory(mutableHistory)
     }
 
     fun clear() {
