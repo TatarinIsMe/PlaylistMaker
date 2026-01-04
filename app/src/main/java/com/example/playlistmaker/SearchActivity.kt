@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -77,7 +78,7 @@ class SearchActivity : AppCompatActivity() {
         rvHistory = findViewById(R.id.rvHistory)
         btnClearHistory = findViewById(R.id.btnClearHistory)
 
-        historyAdapter = TrackAdapter()
+        historyAdapter = TrackAdapter(onItemClick = { track -> onTrackClicked(track) })
         rvHistory.layoutManager = LinearLayoutManager(this)
         rvHistory.adapter = historyAdapter
 
@@ -231,16 +232,20 @@ class SearchActivity : AppCompatActivity() {
         }
     }
     private fun TrackDto.toTrack(): Track {
-        val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault())
-            .format(trackTimeMillis ?: 0L)
         return Track(
             trackId = trackId ?: 0L,
             trackName = trackName.orEmpty(),
             artistName = artistName.orEmpty(),
-            trackTime = formattedTime,
-            artworkUrl100 = artworkUrl100
+            trackTimeMillis = trackTimeMillis ?: 0L,
+            artworkUrl100 = artworkUrl100,
+
+            collectionName = collectionName,
+            releaseDate = releaseDate,
+            primaryGenreName = primaryGenreName,
+            country = country
         )
     }
+
 
     private fun updateHistoryVisibility() {
         val hasFocus = etSearch.hasFocus()
@@ -256,6 +261,11 @@ class SearchActivity : AppCompatActivity() {
     }
     private fun onTrackClicked(track: Track) {
         searchHistory.addTrack(track)
+
+        // Переход в аудиоплеер
+        val intent = Intent(this, AudioPlayerActivity::class.java)
+        intent.putExtra(AudioPlayerActivity.EXTRA_TRACK, track)
+        startActivity(intent)
     }
     private fun showHistory() {
         llHistory.visibility = View.VISIBLE

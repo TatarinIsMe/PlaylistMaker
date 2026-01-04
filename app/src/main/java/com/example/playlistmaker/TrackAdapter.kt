@@ -17,7 +17,7 @@ import com.google.android.material.color.MaterialColors
 
 class TrackAdapter(
     private val items: MutableList<Track> = mutableListOf(),
-            private val onItemClick: ((Track) -> Unit)? = null
+    private val onItemClick: ((Track) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     fun submitList(newItems: List<Track>) {
@@ -33,37 +33,37 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(items[position], position)
+        val track = items[position]
+        holder.bind(track)
+
         holder.itemView.setOnClickListener {
-            onItemClick?.invoke(items[position])
+            onItemClick?.invoke(track)
         }
     }
 
     override fun getItemCount(): Int = items.size
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         private val ivCover: ShapeableImageView = itemView.findViewById(R.id.ivCover)
         private val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
         private val tvArtist: TextView = itemView.findViewById(R.id.tvArtist)
         private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
 
-        fun bind(track: Track, position: Int) {
+        fun bind(track: Track) {
             tvTitle.text = track.trackName
             tvArtist.text = track.artistName
-            tvTime.text = track.trackTime
+            tvTime.text = track.getFormattedTime()
 
             val radius = itemView.resources.getDimensionPixelSize(R.dimen.cover_radius)
+
             Glide.with(itemView)
                 .load(track.artworkUrl100)
                 .transform(RoundedCorners(radius))
                 .placeholder(R.drawable.ic_placeholder_45)
                 .error(R.drawable.ic_placeholder_45)
                 .into(ivCover)
-
-
-            itemView.setOnClickListener {
-
-            }
         }
     }
 }
+

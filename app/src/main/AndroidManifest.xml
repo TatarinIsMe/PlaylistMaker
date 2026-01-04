@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -15,17 +16,19 @@
         android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".AudioPlayerActivity"
+            android:exported="false" />
+        <activity
             android:name=".SearchActivity"
             android:exported="false"
-            android:theme="@style/Test.Theme.PlaylistMaker"/>
+            android:theme="@style/Test.Theme.PlaylistMaker" />
         <activity
             android:name=".MediaActivity"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
-            android:theme="@style/Test.Theme.PlaylistMaker"/>
+            android:theme="@style/Test.Theme.PlaylistMaker" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
