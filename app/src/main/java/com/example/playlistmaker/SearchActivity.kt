@@ -4,20 +4,31 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.Button
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.widget.Button
+import android.widget.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-const val  KEY = "key_search_query"
 class SearchActivity : AppCompatActivity() {
+    private lateinit var flContent: View
+
     private lateinit var etSearch: EditText
     private lateinit var btnClear: ImageButton
 
@@ -25,7 +36,25 @@ class SearchActivity : AppCompatActivity() {
     private var currentQuery: String = ""
 
     private lateinit var rvTracks: RecyclerView
-    private val adapter by lazy { TrackAdapter() }
+
+    private lateinit var llEmptyPlaceholder: View
+    private lateinit var llErrorPlaceholder: View
+    private lateinit var btnRetry: Button
+    private var lastFailedQuery: String = ""
+
+    private lateinit var llHistory: View
+    private lateinit var rvHistory: RecyclerView
+    private lateinit var btnClearHistory: Button
+
+    private lateinit var historyAdapter: TrackAdapter
+    private lateinit var searchHistory: SearchHistory
+
+    private val adapter by lazy {
+        TrackAdapter(onItemClick = { track -> onTrackClicked(track) })
+    }
+
+
+
 
 
 
@@ -39,9 +68,40 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        val sharedPrefs = getSharedPreferences("playlist_maker_prefs", MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPrefs)
+
+        flContent = findViewById(R.id.flContent)
+
+        llHistory = findViewById(R.id.llHistory)
+        rvHistory = findViewById(R.id.rvHistory)
+        btnClearHistory = findViewById(R.id.btnClearHistory)
+
+        historyAdapter = TrackAdapter()
+        rvHistory.layoutManager = LinearLayoutManager(this)
+        rvHistory.adapter = historyAdapter
+
+
+
         etSearch = findViewById(R.id.etSearch)
         btnClear = findViewById(R.id.btnClear)
         ivBack = findViewById(R.id.ivBack)
+        rvTracks = findViewById(R.id.rvTracks)
+        rvTracks.layoutManager = LinearLayoutManager(this)
+        rvTracks.adapter = adapter
+        llEmptyPlaceholder = findViewById<View>(R.id.llEmptyPlaceholder)
+        llErrorPlaceholder = findViewById<View>(R.id.llErrorPlaceholder)
+        btnRetry = findViewById<Button>(R.id.btnRetry)
+
+        etSearch.setOnFocusChangeListener { _, _ ->
+            updateHistoryVisibility()
+        }
+        btnClearHistory.setOnClickListener {
+            searchHistory.clear()
+            llHistory.visibility = View.GONE
+            historyAdapter.submitList(emptyList())
+        }
+
 
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -49,58 +109,107 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 currentQuery = s?.toString().orEmpty()
                 btnClear.visibility = if (!s.isNullOrEmpty()) View.VISIBLE else View.GONE
+                updateHistoryVisibility()
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+        etSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (currentQuery.isNotBlank()) {
+                    performSearch(currentQuery)
+                }
+                true
+            } else {
+                false
+            }
+        }
         btnClear.setOnClickListener {
             etSearch.text?.clear()
             hideKeyboard()
             btnClear.visibility = View.GONE
             etSearch.clearFocus()
+
+            adapter.submitList(emptyList())
+            rvTracks.visibility = View.GONE
+            llEmptyPlaceholder.visibility = View.GONE
+            llErrorPlaceholder.visibility = View.GONE
         }
 
 
 
         ivBack.setOnClickListener { finish() }
-        rvTracks = findViewById(R.id.rvTracks)
-        rvTracks.layoutManager = LinearLayoutManager(this)
-        rvTracks.adapter = adapter
+
+        btnRetry.setOnClickListener {
+            if (lastFailedQuery.isNotBlank()) {
+                performSearch(lastFailedQuery)
+            }
+        }
+    }
+    private fun performSearch(query: String) {
+        hideKeyboard()
+        lastFailedQuery = query
+
+        showSearchResults()
+
+        rvTracks.visibility = View.GONE
+        llEmptyPlaceholder.visibility = View.GONE
+        llErrorPlaceholder.visibility = View.GONE
 
 
-        val demo = arrayListOf(
-            Track(
-                trackName = "Smells Like Teen Spirit jhhkjhkj",
-                artistName = "Nirvana",
-                trackTime = "5:01",
-                artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                trackName = "Billie Jean",
-                artistName = "Michael Jackson",
-                trackTime = "4:35",
-                artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-            ),
-            Track(
-                trackName = "Stayin' Alive",
-                artistName = "Bee Gees",
-                trackTime = "4:10",
-                artworkUrl100 = "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                trackName = "Whole Lotta Love",
-                artistName = "Led Zeppelin",
-                trackTime = "5:33",
-                artworkUrl100 = "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-            ),
-            Track(
-                trackName = "Sweet Child O'Mine",
-                artistName = "Guns N' Roses",
-                trackTime = "5:03",
-                artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            )
-        )
-        adapter.submitList(demo)
+        ItunesService.api.searchTracks(query)
+            .enqueue(object : Callback<TracksSearchResponse> {
+                override fun onResponse(
+                    call: Call<TracksSearchResponse>,
+                    response: Response<TracksSearchResponse>
+                ) {
+                    if (!response.isSuccessful) {
+                        showErrorPlaceholder()
+                        return
+                    }
+
+                    val body = response.body()
+                    val dtos = body?.results.orEmpty()
+                    val tracks = dtos.map { it.toTrack() }
+
+                    if (tracks.isEmpty()) {
+                        showEmptyPlaceholder()
+                    } else {
+                        showTracks(tracks)
+                    }
+                }
+
+                override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
+                    showErrorPlaceholder()
+                }
+            })
+    }
+
+    private fun showTracks(tracks: List<Track>) {
+        showSearchResults()
+
+        adapter.submitList(tracks)
+        rvTracks.visibility = View.VISIBLE
+        llEmptyPlaceholder.visibility = View.GONE
+        llErrorPlaceholder.visibility = View.GONE
+    }
+
+    private fun showEmptyPlaceholder() {
+        showSearchResults()
+
+        adapter.submitList(emptyList())
+        rvTracks.visibility = View.GONE
+        llEmptyPlaceholder.visibility = View.VISIBLE
+        llErrorPlaceholder.visibility = View.GONE
+    }
+
+    private fun showErrorPlaceholder() {
+        showSearchResults()
+
+        adapter.submitList(emptyList())
+        rvTracks.visibility = View.GONE
+        llEmptyPlaceholder.visibility = View.GONE
+        llErrorPlaceholder.visibility = View.VISIBLE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -121,4 +230,46 @@ class SearchActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(it, 0)
         }
     }
+    private fun TrackDto.toTrack(): Track {
+        val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault())
+            .format(trackTimeMillis ?: 0L)
+        return Track(
+            trackId = trackId ?: 0L,
+            trackName = trackName.orEmpty(),
+            artistName = artistName.orEmpty(),
+            trackTime = formattedTime,
+            artworkUrl100 = artworkUrl100
+        )
+    }
+
+    private fun updateHistoryVisibility() {
+        val hasFocus = etSearch.hasFocus()
+        val textEmpty = etSearch.text.isNullOrEmpty()
+        val history = searchHistory.getHistory()
+
+        if (hasFocus && textEmpty && history.isNotEmpty()) {
+            historyAdapter.submitList(history)
+            showHistory()
+        } else {
+            llHistory.visibility = View.GONE
+        }
+    }
+    private fun onTrackClicked(track: Track) {
+        searchHistory.addTrack(track)
+    }
+    private fun showHistory() {
+        llHistory.visibility = View.VISIBLE
+        flContent.visibility = View.GONE
+    }
+
+    private fun showSearchResults() {
+        llHistory.visibility = View.GONE
+        flContent.visibility = View.VISIBLE
+    }
+    companion object {
+        private const val KEY = "key_search_query"
+    }
+
+
+
 }

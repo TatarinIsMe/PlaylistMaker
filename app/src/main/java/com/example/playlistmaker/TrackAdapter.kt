@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,8 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.color.MaterialColors
 
 class TrackAdapter(
-    private val items: MutableList<Track> = mutableListOf()
+    private val items: MutableList<Track> = mutableListOf(),
+            private val onItemClick: ((Track) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     fun submitList(newItems: List<Track>) {
@@ -32,6 +34,9 @@ class TrackAdapter(
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(items[position], position)
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(items[position])
+        }
     }
 
     override fun getItemCount(): Int = items.size
@@ -39,12 +44,13 @@ class TrackAdapter(
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val ivCover: ShapeableImageView = itemView.findViewById(R.id.ivCover)
         private val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
-        private val tvSubtitle: TextView = itemView.findViewById(R.id.tvSubtitle)
-        private val ivChevron: ImageView = itemView.findViewById(R.id.ivChevron)
+        private val tvArtist: TextView = itemView.findViewById(R.id.tvArtist)
+        private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
 
         fun bind(track: Track, position: Int) {
             tvTitle.text = track.trackName
-            tvSubtitle.text = "${track.artistName} • ${track.trackTime}"
+            tvArtist.text = track.artistName
+            tvTime.text = track.trackTime
 
             val radius = itemView.resources.getDimensionPixelSize(R.dimen.cover_radius)
             Glide.with(itemView)
