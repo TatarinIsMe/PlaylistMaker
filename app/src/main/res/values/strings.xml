@@ -31,4 +31,6 @@
     <string name="year" translatable="false">Год</string>
     <string name="album" translatable="false">Альбом</string>
     <string name="length" translatable="false">Длительность</string>
+
+    <string name="time" translatable="false">0:00</string>
 </resources>

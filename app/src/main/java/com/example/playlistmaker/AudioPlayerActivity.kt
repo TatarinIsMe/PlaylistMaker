@@ -18,7 +18,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_player)
 
-        track = intent.getSerializableExtra(EXTRA_TRACK) as Track
+        track = intent.getSerializableExtra(EXTRA_TRACK) as Track //через Parcelable
 
         initViews()
         bindTrack()
@@ -47,7 +47,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         tvArtistName.text = track.artistName
 
         tvDuration.text = track.getFormattedTime()
-        tvProgress.text = "0:00"
+        tvProgress.text = "0:00" //сделать через SimpleDateFormat(c значением 0)
 
         tvGenre.text = track.primaryGenreName.orEmpty()
         tvCountry.text = track.country.orEmpty()
