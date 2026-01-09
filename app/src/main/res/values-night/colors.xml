@@ -12,4 +12,7 @@
 
         <color name="colorOnSurfaceInverse">#FFFFFF</color>
         <color name="colorControlActivated">#3772E7</color>
+
+        <color name="play_icon_tint">#1A1B22</color>
+
 </resources>

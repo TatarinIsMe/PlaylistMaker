@@ -50,6 +50,10 @@
     <style name="Shape.SmallRounded" parent="">
         <item name="cornerSize">6dp</item>
     </style>
+    <style name="ShapeAppearanceOverlay.App.Cover" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
 
 
 
