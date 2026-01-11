@@ -1,7 +1,9 @@
 package com.example.playlistmaker
 
 import java.io.Serializable
-
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+@Parcelize
 data class Track(
     val trackId: Long,
     val trackName: String,
@@ -12,18 +14,16 @@ data class Track(
     val collectionName: String?,
     val releaseDate: String?,
     val primaryGenreName: String?,
-    val country: String?
-) : Serializable {
+    val country: String?,
+    val previewUrl: String?
+) : Parcelable {
 
-    // Большая обложка для экрана плеера
     fun getCoverArtwork(): String? =
         artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
 
-    // Год релиза из releaseDate
     fun getReleaseYear(): String? =
         releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
 
-    // Формат времени mm:ss (для списка)
     fun getFormattedTime(): String {
         val totalSeconds = trackTimeMillis / 1000
         val minutes = totalSeconds / 60
