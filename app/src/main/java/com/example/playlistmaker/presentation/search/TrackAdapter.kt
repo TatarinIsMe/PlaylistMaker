@@ -1,19 +1,15 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.search
 
-import android.content.res.ColorStateList
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.model.Track
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.color.MaterialColors
 
 class TrackAdapter(
     private val items: MutableList<Track> = mutableListOf(),
@@ -66,4 +62,3 @@ class TrackAdapter(
         }
     }
 }
-
