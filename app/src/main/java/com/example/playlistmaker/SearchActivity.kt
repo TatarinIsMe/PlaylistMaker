@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -50,6 +52,16 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyAdapter: TrackAdapter
     private lateinit var searchHistory: SearchHistory
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val SEARCH_DEBOUNCE_DELAY = 2000L
+    private var searchRunnable: Runnable? = null
+
+    private lateinit var progressBar: ProgressBar
+
+    private val CLICK_DEBOUNCE_DELAY = 1000L
+    private var isClickAllowed = true
+
+
     private val adapter by lazy {
         TrackAdapter(onItemClick = { track -> onTrackClicked(track) })
     }
@@ -71,6 +83,8 @@ class SearchActivity : AppCompatActivity() {
 
         val sharedPrefs = getSharedPreferences("playlist_maker_prefs", MODE_PRIVATE)
         searchHistory = SearchHistory(sharedPrefs)
+
+        progressBar = findViewById(R.id.progressBar)
 
         flContent = findViewById(R.id.flContent)
 
@@ -111,6 +125,12 @@ class SearchActivity : AppCompatActivity() {
                 currentQuery = s?.toString().orEmpty()
                 btnClear.visibility = if (!s.isNullOrEmpty()) View.VISIBLE else View.GONE
                 updateHistoryVisibility()
+
+                searchRunnable?.let { handler.removeCallbacks(it) }
+                if (currentQuery.isBlank()) return
+
+                searchRunnable = Runnable { performSearch(currentQuery) }
+                handler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_DELAY)
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -157,6 +177,8 @@ class SearchActivity : AppCompatActivity() {
         llEmptyPlaceholder.visibility = View.GONE
         llErrorPlaceholder.visibility = View.GONE
 
+        showLoading()
+
 
         ItunesService.api.searchTracks(query)
             .enqueue(object : Callback<TracksSearchResponse> {
@@ -164,6 +186,7 @@ class SearchActivity : AppCompatActivity() {
                     call: Call<TracksSearchResponse>,
                     response: Response<TracksSearchResponse>
                 ) {
+                    hideLoading()
                     if (!response.isSuccessful) {
                         showErrorPlaceholder()
                         return
@@ -181,6 +204,7 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
+                    hideLoading()
                     showErrorPlaceholder()
                 }
             })
@@ -242,7 +266,8 @@ class SearchActivity : AppCompatActivity() {
             collectionName = collectionName,
             releaseDate = releaseDate,
             primaryGenreName = primaryGenreName,
-            country = country
+            country = country,
+            previewUrl = previewUrl
         )
     }
 
@@ -260,9 +285,10 @@ class SearchActivity : AppCompatActivity() {
         }
     }
     private fun onTrackClicked(track: Track) {
+        if (!clickDebounce()) return
+
         searchHistory.addTrack(track)
 
-        // Переход в аудиоплеер
         val intent = Intent(this, AudioPlayerActivity::class.java)
         intent.putExtra(AudioPlayerActivity.EXTRA_TRACK, track)
         startActivity(intent)
@@ -275,6 +301,28 @@ class SearchActivity : AppCompatActivity() {
     private fun showSearchResults() {
         llHistory.visibility = View.GONE
         flContent.visibility = View.VISIBLE
+    }
+
+    private fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        progressBar.visibility = View.GONE
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    override fun onDestroy() {
+        searchRunnable?.let { handler.removeCallbacks(it) }
+        super.onDestroy()
     }
     companion object {
         private const val KEY = "key_search_query"
