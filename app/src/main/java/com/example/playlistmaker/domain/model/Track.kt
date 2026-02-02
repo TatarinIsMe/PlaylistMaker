@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.domain.model
 
-import java.io.Serializable
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 @Parcelize

@@ -1,8 +1,9 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
+import com.example.playlistmaker.R
 import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.example.playlistmaker.domain.model.Track
 
 class AudioPlayerActivity : AppCompatActivity() {
 
@@ -18,7 +20,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
 
     private val handler = Handler(Looper.getMainLooper())
-    private val UPDATE_PROGRESS_DELAY = 300L
     private var progressRunnable: Runnable? = null
 
     private var isPrepared = false
@@ -49,7 +50,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     private fun bindTrackUi() {
-        val ivCover = findViewById<ImageView>(R.id.ivCover) // если ShapeableImageView — тоже ок
+        val ivCover = findViewById<ImageView>(R.id.ivCover)
         val tvTrackName = findViewById<TextView>(R.id.tvTrackName)
         val tvArtistName = findViewById<TextView>(R.id.tvArtistName)
         val tvDuration = findViewById<TextView>(R.id.tvDuration)
@@ -188,6 +189,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val UPDATE_PROGRESS_DELAY = 300L
         const val EXTRA_TRACK = "extra_track"
     }
 }
