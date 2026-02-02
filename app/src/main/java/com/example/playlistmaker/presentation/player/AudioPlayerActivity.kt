@@ -32,8 +32,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_player)
 
-//        track = intent.getSerializableExtra(EXTRA_TRACK) as Track //через Parcelable
-        track = intent.getParcelableExtra(EXTRA_TRACK)!!
+        track = intent.getSerializableExtra(EXTRA_TRACK) as? Track
+            ?: throw IllegalStateException("Track extra is required")
 
         btnPlay = findViewById(R.id.btnPlay)
         tvProgress = findViewById(R.id.tvProgress)

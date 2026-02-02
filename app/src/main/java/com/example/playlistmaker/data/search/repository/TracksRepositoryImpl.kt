@@ -1,11 +1,11 @@
-package com.example.playlistmaker.data.repository
+package com.example.playlistmaker.data.search.repository
 
-import com.example.playlistmaker.data.model.TrackDto
-import com.example.playlistmaker.data.model.TracksSearchResponse
-import com.example.playlistmaker.data.model.toTrack
-import com.example.playlistmaker.data.network.ItunesApi
+import com.example.playlistmaker.data.search.model.TrackDto
+import com.example.playlistmaker.data.search.model.TracksSearchResponse
+import com.example.playlistmaker.data.search.model.toTrack
+import com.example.playlistmaker.data.search.network.ItunesApi
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.domain.repository.TracksRepository
+import com.example.playlistmaker.domain.search.repository.TracksRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

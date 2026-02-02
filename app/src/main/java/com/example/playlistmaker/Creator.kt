@@ -2,16 +2,16 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.playlistmaker.data.network.ItunesApi
-import com.example.playlistmaker.data.repository.TracksRepositoryImpl
-import com.example.playlistmaker.data.storage.SearchHistoryRepositoryImpl
-import com.example.playlistmaker.data.storage.SettingsRepositoryImpl
-import com.example.playlistmaker.domain.interactor.SearchHistoryInteractor
-import com.example.playlistmaker.domain.interactor.SearchHistoryInteractorImpl
-import com.example.playlistmaker.domain.interactor.SearchInteractor
-import com.example.playlistmaker.domain.interactor.SearchInteractorImpl
-import com.example.playlistmaker.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.domain.interactor.SettingsInteractorImpl
+import com.example.playlistmaker.data.search.network.ItunesApi
+import com.example.playlistmaker.data.search.repository.TracksRepositoryImpl
+import com.example.playlistmaker.data.search.storage.SearchHistoryRepositoryImpl
+import com.example.playlistmaker.data.settings.storage.SettingsRepositoryImpl
+import com.example.playlistmaker.domain.search.interactor.SearchHistoryInteractor
+import com.example.playlistmaker.domain.search.interactor.SearchHistoryInteractorImpl
+import com.example.playlistmaker.domain.search.interactor.SearchInteractor
+import com.example.playlistmaker.domain.search.interactor.SearchInteractorImpl
+import com.example.playlistmaker.domain.settings.interactor.SettingsInteractor
+import com.example.playlistmaker.domain.settings.interactor.SettingsInteractorImpl
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

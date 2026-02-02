@@ -1,7 +1,8 @@
-package com.example.playlistmaker.data.storage
+package com.example.playlistmaker.data.settings.storage
 
 import android.content.SharedPreferences
-import com.example.playlistmaker.domain.repository.SettingsRepository
+import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.domain.settings.repository.SettingsRepository
 
 class SettingsRepositoryImpl(
     private val sharedPreferences: SharedPreferences
@@ -19,5 +20,13 @@ class SettingsRepositoryImpl(
         sharedPreferences.edit()
             .putBoolean(KEY_DARK_THEME, enabled)
             .apply()
+        applyTheme(enabled)
+    }
+
+    private fun applyTheme(enabled: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(
+            if (enabled) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 }
