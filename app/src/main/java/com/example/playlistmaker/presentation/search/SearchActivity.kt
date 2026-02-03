@@ -3,8 +3,6 @@ package com.example.playlistmaker.presentation.search
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -32,7 +30,8 @@ class SearchActivity : AppCompatActivity() {
     private val viewModel: SearchViewModel by viewModels {
         SearchViewModelFactory(
             creator.searchInteractor,
-            creator.searchHistoryInteractor
+            creator.searchHistoryInteractor,
+            creator.playerInteractor
         )
     }
 
@@ -49,9 +48,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var btnClearHistory: Button
     private lateinit var progressBar: ProgressBar
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val CLICK_DEBOUNCE_DELAY = 1000L
-    private var isClickAllowed = true
     private val adapter by lazy { TrackAdapter(onItemClick = { track -> onTrackClicked(track) }) }
     private lateinit var historyAdapter: TrackAdapter
 
@@ -143,7 +139,9 @@ class SearchActivity : AppCompatActivity() {
             renderState(state)
         }
         viewModel.navigationEvent.observe(this) { event ->
-            event.getContentIfNotHandled()?.let { navigateToPlayer(it) }
+            event.getContentIfNotHandled()?.let { trackId ->
+                navigateToPlayer(trackId)
+            }
         }
     }
 
@@ -165,13 +163,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun onTrackClicked(track: Track) {
-        if (!clickDebounce()) return
         viewModel.onTrackSelected(track)
     }
 
-    private fun navigateToPlayer(track: Track) {
+    private fun navigateToPlayer(trackId: Long) {
         val intent = Intent(this, AudioPlayerActivity::class.java)
-        intent.putExtra(AudioPlayerActivity.EXTRA_TRACK, track)
+        intent.putExtra(AudioPlayerActivity.EXTRA_TRACK_ID, trackId)
         startActivity(intent)
     }
 
@@ -192,17 +189,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
-    }
-
     override fun onDestroy() {
-        handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 }

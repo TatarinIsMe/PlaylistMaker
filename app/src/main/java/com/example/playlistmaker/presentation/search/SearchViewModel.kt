@@ -6,12 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.player.interactor.PlayerInteractor
 import com.example.playlistmaker.domain.search.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.domain.search.interactor.SearchInteractor
 
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
-    private val historyInteractor: SearchHistoryInteractor
+    private val historyInteractor: SearchHistoryInteractor,
+    private val playerInteractor: PlayerInteractor
 ) : ViewModel() {
 
     companion object {
@@ -24,12 +26,13 @@ class SearchViewModel(
     private var lastFailedQuery = ""
     private var isSearchFieldFocused = false
     private var historyCache: List<Track> = emptyList()
+    private var isClickAllowed = true
 
     private val _state = MutableLiveData(SearchUiState())
     val state: LiveData<SearchUiState> = _state
 
-    private val _navigationEvent = MutableLiveData<Event<Track>>()
-    val navigationEvent: LiveData<Event<Track>> = _navigationEvent
+    private val _navigationEvent = MutableLiveData<Event<Long>>()
+    val navigationEvent: LiveData<Event<Long>> = _navigationEvent
 
     init {
         refreshHistoryCache()
@@ -82,9 +85,15 @@ class SearchViewModel(
     }
 
     fun onTrackSelected(track: Track) {
+        if (!isClickAllowed) return
+
+        isClickAllowed = false
+        playerInteractor.saveTrack(track)
         historyInteractor.addTrack(track)
         refreshHistoryCache()
-        _navigationEvent.value = Event(track)
+        _navigationEvent.value = Event(track.trackId)
+
+        handler.postDelayed({ isClickAllowed = true }, 1000L)
     }
 
     fun onClearHistory() {
@@ -94,6 +103,7 @@ class SearchViewModel(
 
     override fun onCleared() {
         searchRunnable?.let { handler.removeCallbacks(it) }
+        handler.removeCallbacksAndMessages(null)
         super.onCleared()
     }
 
