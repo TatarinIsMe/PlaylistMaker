@@ -7,20 +7,10 @@ class App : Application() {
     lateinit var creator: Creator
         private set
 
-    var darkTheme: Boolean = false
-        private set
-
     override fun onCreate() {
         super.onCreate()
         creator = Creator(this)
-        darkTheme = creator.settingsInteractor.isDarkThemeEnabled()
-        applyTheme(darkTheme)
-    }
-
-    fun switchTheme(enabled: Boolean) {
-        darkTheme = enabled
-        creator.settingsInteractor.switchTheme(enabled)
-        applyTheme(enabled)
+        applyTheme(creator.settingsInteractor.isDarkThemeEnabled())
     }
 
     private fun applyTheme(enabled: Boolean) {

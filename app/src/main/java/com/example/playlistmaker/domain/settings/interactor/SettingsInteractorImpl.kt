@@ -1,6 +1,6 @@
-package com.example.playlistmaker.domain.interactor
+package com.example.playlistmaker.domain.settings.interactor
 
-import com.example.playlistmaker.domain.repository.SettingsRepository
+import com.example.playlistmaker.domain.settings.repository.SettingsRepository
 
 class SettingsInteractorImpl(
     private val repository: SettingsRepository

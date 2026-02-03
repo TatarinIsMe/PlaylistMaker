@@ -1,7 +1,7 @@
-package com.example.playlistmaker.domain.interactor
+package com.example.playlistmaker.domain.search.interactor
 
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.domain.repository.TracksRepository
+import com.example.playlistmaker.domain.search.repository.TracksRepository
 
 class SearchInteractorImpl(
     private val tracksRepository: TracksRepository

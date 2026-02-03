@@ -1,8 +1,8 @@
-package com.example.playlistmaker.data.storage
+package com.example.playlistmaker.data.search.storage
 
 import android.content.SharedPreferences
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.domain.repository.SearchHistoryRepository
+import com.example.playlistmaker.domain.search.repository.SearchHistoryRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
