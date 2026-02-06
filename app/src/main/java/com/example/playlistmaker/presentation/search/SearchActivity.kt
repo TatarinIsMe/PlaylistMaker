@@ -14,26 +14,18 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.presentation.player.AudioPlayerActivity
 
 class SearchActivity : AppCompatActivity() {
-    private val creator by lazy { (applicationContext as App).creator }
-    private val viewModel: SearchViewModel by viewModels {
-        SearchViewModelFactory(
-            creator.searchInteractor,
-            creator.searchHistoryInteractor,
-            creator.playerInteractor
-        )
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var flContent: View
     private lateinit var etSearch: EditText
