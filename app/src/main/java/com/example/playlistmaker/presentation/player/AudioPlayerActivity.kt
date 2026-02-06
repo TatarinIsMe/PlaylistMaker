@@ -5,22 +5,19 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.viewModels
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private val creator by lazy { (applicationContext as App).creator }
     private val trackId: Long by lazy {
         intent.getLongExtra(EXTRA_TRACK_ID, -1L).takeIf { it >= 0 }
             ?: throw IllegalStateException("Track ID extra is required")
     }
-    private val viewModel: AudioPlayerViewModel by viewModels {
-        AudioPlayerViewModelFactory(trackId, creator.playerInteractor)
-    }
+    private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(trackId) }
 
     private lateinit var btnPlay: ImageButton
     private lateinit var ivCover: ImageView
