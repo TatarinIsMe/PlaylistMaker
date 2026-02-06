@@ -6,61 +6,102 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.App
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.example.playlistmaker.R
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
     private val creator by lazy { (applicationContext as App).creator }
-    private val settingsInteractor by lazy { creator.settingsInteractor }
+    private val viewModel: SettingsViewModel by viewModels {
+        SettingsViewModelFactory(creator.settingsInteractor)
+    }
+
+    private lateinit var themeSwitcher: SwitchMaterial
+    private var isSwitchUpdating = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         enableEdgeToEdge()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val img = findViewById<ImageView>(R.id.back_arrow)
-        img.setOnClickListener {
-            finish()
-        }
+
+        themeSwitcher = findViewById(R.id.themeSwitcher)
+
+        val back = findViewById<ImageView>(R.id.back_arrow)
         val shareLayout = findViewById<LinearLayout>(R.id.share_layout)
-        shareLayout.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_message))
-            }
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
-        }
-
         val supportLayout = findViewById<LinearLayout>(R.id.support_layout)
-        supportLayout.setOnClickListener {
-            val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
-                putExtra(Intent.EXTRA_TEXT, getString(R.string.support_body))
-            }
-            startActivity(emailIntent)
-        }
         val licenceLayout = findViewById<LinearLayout>(R.id.licence_layout)
-        licenceLayout.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.licence_url)))
-            startActivity(browserIntent)
+
+        bindObservers()
+
+        back.setOnClickListener { viewModel.onBackClicked() }
+
+        shareLayout.setOnClickListener {
+            viewModel.onShareClicked(getString(R.string.share_message))
         }
 
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
-        themeSwitcher.isChecked = settingsInteractor.isDarkThemeEnabled()
+        supportLayout.setOnClickListener {
+            viewModel.onSupportClicked(
+                email = getString(R.string.support_email),
+                subject = getString(R.string.support_subject),
+                body = getString(R.string.support_body)
+            )
+        }
+
+        licenceLayout.setOnClickListener {
+            viewModel.onLicenceClicked(getString(R.string.licence_url))
+        }
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            settingsInteractor.switchTheme(checked)
+            if (isSwitchUpdating) return@setOnCheckedChangeListener
+            viewModel.onDarkThemeToggled(checked)
+        }
+    }
+
+    private fun bindObservers() {
+        viewModel.state.observe(this) { state ->
+            isSwitchUpdating = true
+            themeSwitcher.isChecked = state.isDarkThemeEnabled
+            isSwitchUpdating = false
+        }
+
+        viewModel.effect.observe(this) { effect ->
+            when (effect) {
+                SettingsEffect.Close -> finish()
+
+                is SettingsEffect.Share -> {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, effect.text)
+                    }
+                    startActivity(Intent.createChooser(intent, getString(R.string.share_app)))
+                }
+
+                is SettingsEffect.SupportEmail -> {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:")
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf(effect.email))
+                        putExtra(Intent.EXTRA_SUBJECT, effect.subject)
+                        putExtra(Intent.EXTRA_TEXT, effect.body)
+                    }
+                    startActivity(intent)
+                }
+
+                is SettingsEffect.OpenUrl -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(effect.url))
+                    startActivity(intent)
+                }
+            }
         }
     }
 }

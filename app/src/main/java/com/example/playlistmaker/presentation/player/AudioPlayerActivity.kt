@@ -1,195 +1,97 @@
 package com.example.playlistmaker.presentation.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Handler
-import com.example.playlistmaker.R
-import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.App
+import com.example.playlistmaker.R
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private lateinit var track: Track
-
-    private var mediaPlayer: MediaPlayer? = null
-
-    private val handler = Handler(Looper.getMainLooper())
-    private var progressRunnable: Runnable? = null
-
-    private var isPrepared = false
-    private var isPlay = false
+    private val creator by lazy { (applicationContext as App).creator }
+    private val trackId: Long by lazy {
+        intent.getLongExtra(EXTRA_TRACK_ID, -1L).takeIf { it >= 0 }
+            ?: throw IllegalStateException("Track ID extra is required")
+    }
+    private val viewModel: AudioPlayerViewModel by viewModels {
+        AudioPlayerViewModelFactory(trackId, creator.playerInteractor)
+    }
 
     private lateinit var btnPlay: ImageButton
+    private lateinit var ivCover: ImageView
+    private lateinit var tvTrackName: TextView
+    private lateinit var tvArtistName: TextView
+    private lateinit var tvDuration: TextView
     private lateinit var tvProgress: TextView
+    private lateinit var tvAlbumLabel: TextView
+    private lateinit var tvAlbum: TextView
+    private lateinit var tvYearLabel: TextView
+    private lateinit var tvYear: TextView
+    private lateinit var tvGenre: TextView
+    private lateinit var tvCountry: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_player)
 
-        track = intent.getSerializableExtra(EXTRA_TRACK) as? Track
-            ?: throw IllegalStateException("Track extra is required")
-
         btnPlay = findViewById(R.id.btnPlay)
+        ivCover = findViewById(R.id.ivCover)
+        tvTrackName = findViewById(R.id.tvTrackName)
+        tvArtistName = findViewById(R.id.tvArtistName)
+        tvDuration = findViewById(R.id.tvDuration)
         tvProgress = findViewById(R.id.tvProgress)
+        tvAlbumLabel = findViewById(R.id.tvAlbumLabel)
+        tvAlbum = findViewById(R.id.tvAlbum)
+        tvYearLabel = findViewById(R.id.tvYearLabel)
+        tvYear = findViewById(R.id.tvYear)
+        tvGenre = findViewById(R.id.tvGenre)
+        tvCountry = findViewById(R.id.tvCountry)
 
-        findViewById<ImageView>(R.id.buttonBack).setOnClickListener {
-            finish()
-        }
+        findViewById<ImageView>(R.id.buttonBack).setOnClickListener { finish() }
+        btnPlay.setOnClickListener { viewModel.onPlayPauseClicked() }
 
-        bindTrackUi()
-        preparePlayer()
-
-        btnPlay.setOnClickListener { onPlayPauseClicked() }
-
-    }
-
-    private fun bindTrackUi() {
-        val ivCover = findViewById<ImageView>(R.id.ivCover)
-        val tvTrackName = findViewById<TextView>(R.id.tvTrackName)
-        val tvArtistName = findViewById<TextView>(R.id.tvArtistName)
-        val tvDuration = findViewById<TextView>(R.id.tvDuration)
-        val tvProgress = findViewById<TextView>(R.id.tvProgress)
-
-        val tvAlbumLabel = findViewById<TextView>(R.id.tvAlbumLabel)
-        val tvAlbum = findViewById<TextView>(R.id.tvAlbum)
-
-        val tvYearLabel = findViewById<TextView>(R.id.tvYearLabel)
-        val tvYear = findViewById<TextView>(R.id.tvYear)
-
-        val tvGenre = findViewById<TextView>(R.id.tvGenre)
-        val tvCountry = findViewById<TextView>(R.id.tvCountry)
-
-        tvTrackName.text = track.trackName
-        tvArtistName.text = track.artistName
-
-        tvDuration.text = formatTime(track.trackTimeMillis)
-        tvProgress.text = formatTime(0L)
-
-        tvGenre.text = track.primaryGenreName.orEmpty()
-        tvCountry.text = track.country.orEmpty()
-
-        val year = track.releaseDate?.take(4)
-        if (year.isNullOrBlank()) {
-            tvYear.visibility = View.GONE
-            tvYearLabel.visibility = View.GONE
-        } else {
-            tvYear.visibility = View.VISIBLE
-            tvYearLabel.visibility = View.VISIBLE
-            tvYear.text = year
-        }
-
-
-        if (track.collectionName.isNullOrBlank()) {
-            tvAlbum.visibility = View.GONE
-            tvAlbumLabel.visibility = View.GONE
-        } else {
-            tvAlbum.visibility = View.VISIBLE
-            tvAlbumLabel.visibility = View.VISIBLE
-            tvAlbum.text = track.collectionName
-        }
-
-        val coverUrl = track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
-
-        Glide.with(this)
-            .load(coverUrl)
-            .placeholder(R.drawable.ic_placeholder_45)
-            .error(R.drawable.ic_placeholder_45)
-            .into(ivCover)
-    }
-
-    private fun preparePlayer() {
-        val url = track.previewUrl
-        if (url.isNullOrBlank()) {
-            btnPlay.isEnabled = false
-            return
-        }
-
-        mediaPlayer = MediaPlayer().apply {
-            setDataSource(url)
-            setOnPreparedListener {
-                isPrepared = true
-            }
-            setOnCompletionListener {
-                stopProgressUpdates()
-                isPlay = false
-                btnPlay.setImageResource(R.drawable.ic_play)
-                tvProgress.text = formatTime(0L)
-            }
-            prepareAsync()
-        }
-    }
-
-    private fun onPlayPauseClicked() {
-        if (!isPrepared) return
-
-        val player = mediaPlayer ?: return
-
-        if (isPlay) {
-            // PAUSE
-            player.pause()
-            isPlay = false
-            btnPlay.setImageResource(R.drawable.ic_play)
-            stopProgressUpdates()
-        } else {
-            if (player.currentPosition >= player.duration) {
-                player.seekTo(0)
-                tvProgress.text = formatTime(0L)
-            }
-
-            player.start()
-            isPlay = true
-            btnPlay.setImageResource(R.drawable.ic_pause)
-            startProgressUpdates()
-        }
-    }
-    private fun startProgressUpdates() {
-        stopProgressUpdates()
-        progressRunnable = Runnable {
-            val player = mediaPlayer ?: return@Runnable
-            tvProgress.text = formatTime(player.currentPosition.toLong())
-            handler.postDelayed(progressRunnable!!, UPDATE_PROGRESS_DELAY)
-        }
-        handler.postDelayed(progressRunnable!!, UPDATE_PROGRESS_DELAY)
-    }
-
-    private fun stopProgressUpdates() {
-        progressRunnable?.let { handler.removeCallbacks(it) }
-        progressRunnable = null
+        bindObservers()
     }
 
     override fun onPause() {
         super.onPause()
-        val player = mediaPlayer ?: return
-        if (isPlay) {
-            player.pause()
-            isPlay = false
-            btnPlay.setImageResource(R.drawable.ic_play)
-            stopProgressUpdates()
+        viewModel.onPausePlayback()
+    }
+
+    private fun bindObservers() {
+        viewModel.state.observe(this) { state ->
+            tvTrackName.text = state.trackName
+            tvArtistName.text = state.artistName
+            tvDuration.text = state.durationText
+            tvProgress.text = state.progressText
+            tvGenre.text = state.genreText
+            tvCountry.text = state.countryText
+
+            tvAlbum.text = state.albumText
+            tvAlbum.visibility = if (state.isAlbumVisible) View.VISIBLE else View.GONE
+            tvAlbumLabel.visibility = if (state.isAlbumVisible) View.VISIBLE else View.GONE
+
+            tvYear.text = state.yearText
+            tvYear.visibility = if (state.isYearVisible) View.VISIBLE else View.GONE
+            tvYearLabel.visibility = if (state.isYearVisible) View.VISIBLE else View.GONE
+
+            btnPlay.isEnabled = state.isPlayEnabled
+            btnPlay.setImageResource(if (state.isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
+
+            Glide.with(this)
+                .load(state.coverUrl)
+                .placeholder(R.drawable.ic_placeholder_45)
+                .error(R.drawable.ic_placeholder_45)
+                .into(ivCover)
         }
     }
 
-    override fun onDestroy() {
-        stopProgressUpdates()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        super.onDestroy()
-    }
-
-    private fun formatTime(millis: Long): String {
-        val totalSeconds = millis / 1000
-        val minutes = totalSeconds / 60
-        val seconds = totalSeconds % 60
-        return String.format("%d:%02d", minutes, seconds)
-    }
-
     companion object {
-        const val UPDATE_PROGRESS_DELAY = 300L
-        const val EXTRA_TRACK = "extra_track"
+        const val EXTRA_TRACK_ID = "extra_track_id"
     }
 }
