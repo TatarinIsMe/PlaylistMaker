@@ -13,4 +13,15 @@
         <color name="colorOutline">#DADCE0</color>
         <color name="colorOnSurfaceInverse">#AEAFB4</color>
     <color name="colorControlActivated">#00D6C3</color>
+    <color name="debugStrokeRed">#D32F2F</color>
+    <color name="debugStrokeBlue">#1565C0</color>
+
+    <color name="circle_grey">#D9D9D9</color>
+    <color name="circle_dark">#1A1B22</color>
+    <color name="icon_grey">#8E8E93</color>
+    <color name="text_secondary">#A0A0A0</color>
+    <color name="placeholder_bg">#E6E6E6</color>
+
+    <color name="play_icon_tint">#FFFFFF</color>
+
 </resources>

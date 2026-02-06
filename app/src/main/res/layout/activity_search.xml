@@ -6,7 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SearchActivity">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminate="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -94,6 +106,130 @@
             android:visibility="gone"
             app:tint="?attr/colorOnSurfaceVariant"/>
 
+    </FrameLayout>
+    <!-- Блок истории -->
+    <LinearLayout
+        android:id="@+id/llHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:paddingTop="32dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvHistoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_title"
+            android:textSize="19sp"
+            android:textColor="?attr/colorOnBackground"
+            android:fontFamily="@font/ys_display_medium"
+            android:layout_marginBottom="16dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="@dimen/list_top_padding"
+            tools:listitem="@layout/item_track" />
+
+        <Button
+            android:id="@+id/btnClearHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/list_top_padding"
+            android:text="@string/clear_history"
+            android:backgroundTint="?attr/colorOnBackground"
+            android:textColor="@color/colorBackground"
+            android:fontFamily="@font/ys_display_medium"
+            android:layout_marginBottom="16dp"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/flContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/list_top_padding">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingTop="@dimen/list_top_padding"
+        tools:listitem="@layout/item_track" />
+    <!-- Заглушка: ничего не найдено -->
+    <LinearLayout
+        android:id="@+id/llEmptyPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search_nothing_120"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_nothing_text"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnBackground"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/ys_display_medium"/>
+    </LinearLayout>
+    <!-- Заглушка: проблемы со связью -->
+    <LinearLayout
+        android:id="@+id/llErrorPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search_error_120"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_connection_title"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnBackground"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/ys_display_medium"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_connection_text"
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnBackground"
+            android:gravity="center"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/ys_display_medium"/>
+
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reload"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="?attr/colorOnBackground"
+            android:textColor="@color/colorBackground"
+            android:fontFamily="@font/ys_display_medium"/>
+    </LinearLayout>
     </FrameLayout>
 </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
