@@ -16,4 +16,9 @@
     <string name="search_hint">Search</string>
     <string name="content_desc_back">Back</string>
     <string name="content_desc_clear">Clear</string>
+    <string name="tab_playlists">Playlists</string>
+    <string name="tab_favorites">Favorite tracks</string>
+    <string name="new_playlist">New playlist</string>
+    <string name="playlists_placeholder">You haven’t created any playlists</string>
+    <string name="favorites_placeholder">Your media library is empty</string>
 </resources>
