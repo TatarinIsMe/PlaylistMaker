@@ -24,7 +24,8 @@
             android:theme="@style/Test.Theme.PlaylistMaker" />
         <activity
             android:name=".presentation.media.MediaActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Test.Theme.PlaylistMaker" />
         <activity
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"
