@@ -41,7 +41,7 @@
             android:layout_height="120dp"
             android:src="@drawable/ic_search_nothing_120"
             android:contentDescription="@null"
-            app:tint="?attr/colorOnSurfaceVariant" />
+            />
 
         <TextView
             android:layout_width="wrap_content"
