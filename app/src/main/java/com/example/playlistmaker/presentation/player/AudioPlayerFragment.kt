@@ -5,18 +5,23 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
-class AudioPlayerActivity : AppCompatActivity() {
+class AudioPlayerFragment : Fragment(R.layout.activity_audio_player) {
 
     private val trackId: Long by lazy {
-        intent.getLongExtra(EXTRA_TRACK_ID, -1L).takeIf { it >= 0 }
-            ?: throw IllegalStateException("Track ID extra is required")
+        val args = requireArguments()
+        if (!args.containsKey(ARG_TRACK_ID)) {
+            error("Track ID argument is required")
+        }
+        args.getLong(ARG_TRACK_ID).takeIf { it >= 0 } ?: error("Track ID argument is invalid")
     }
+
     private val viewModel: AudioPlayerViewModel by viewModel { parametersOf(trackId) }
 
     private lateinit var btnPlay: ImageButton
@@ -32,24 +37,25 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var tvGenre: TextView
     private lateinit var tvCountry: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_audio_player)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        btnPlay = findViewById(R.id.btnPlay)
-        ivCover = findViewById(R.id.ivCover)
-        tvTrackName = findViewById(R.id.tvTrackName)
-        tvArtistName = findViewById(R.id.tvArtistName)
-        tvDuration = findViewById(R.id.tvDuration)
-        tvProgress = findViewById(R.id.tvProgress)
-        tvAlbumLabel = findViewById(R.id.tvAlbumLabel)
-        tvAlbum = findViewById(R.id.tvAlbum)
-        tvYearLabel = findViewById(R.id.tvYearLabel)
-        tvYear = findViewById(R.id.tvYear)
-        tvGenre = findViewById(R.id.tvGenre)
-        tvCountry = findViewById(R.id.tvCountry)
+        btnPlay = view.findViewById(R.id.btnPlay)
+        ivCover = view.findViewById(R.id.ivCover)
+        tvTrackName = view.findViewById(R.id.tvTrackName)
+        tvArtistName = view.findViewById(R.id.tvArtistName)
+        tvDuration = view.findViewById(R.id.tvDuration)
+        tvProgress = view.findViewById(R.id.tvProgress)
+        tvAlbumLabel = view.findViewById(R.id.tvAlbumLabel)
+        tvAlbum = view.findViewById(R.id.tvAlbum)
+        tvYearLabel = view.findViewById(R.id.tvYearLabel)
+        tvYear = view.findViewById(R.id.tvYear)
+        tvGenre = view.findViewById(R.id.tvGenre)
+        tvCountry = view.findViewById(R.id.tvCountry)
 
-        findViewById<ImageView>(R.id.buttonBack).setOnClickListener { finish() }
+        view.findViewById<ImageView>(R.id.buttonBack).setOnClickListener {
+            findNavController().navigateUp()
+        }
         btnPlay.setOnClickListener { viewModel.onPlayPauseClicked() }
 
         bindObservers()
@@ -61,7 +67,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     private fun bindObservers() {
-        viewModel.state.observe(this) { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
             tvTrackName.text = state.trackName
             tvArtistName.text = state.artistName
             tvDuration.text = state.durationText
@@ -89,6 +95,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val EXTRA_TRACK_ID = "extra_track_id"
+        const val ARG_TRACK_ID = "trackId"
     }
 }

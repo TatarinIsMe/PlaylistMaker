@@ -11,7 +11,8 @@
 
         <color name="colorOnSurfaceVariant">#6D6D71</color>
         <color name="colorOutline">#DADCE0</color>
-        <color name="colorOnSurfaceInverse">#AEAFB4</color>
+    <color name="colorOnSurfaceInverse">#AEAFB4</color>
+    <color name="colorSelectedBlue">#3772E7</color>
     <color name="colorControlActivated">#00D6C3</color>
     <color name="debugStrokeRed">#D32F2F</color>
     <color name="debugStrokeBlue">#1565C0</color>

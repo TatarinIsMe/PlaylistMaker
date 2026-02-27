@@ -9,6 +9,7 @@
 
         <color name="colorOnSurfaceVariant">#B0B3B8</color>
         <color name="colorOutline">#2F3237</color>
+        <color name="colorSelectedBlue">#3772E7</color>
 
         <color name="colorOnSurfaceInverse">#FFFFFF</color>
         <color name="colorControlActivated">#3772E7</color>
