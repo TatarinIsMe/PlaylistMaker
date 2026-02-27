@@ -1,49 +1,33 @@
 package com.example.playlistmaker.presentation.main
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
-import com.example.playlistmaker.presentation.media.MediaActivity
-import com.example.playlistmaker.presentation.search.SearchActivity
-import com.example.playlistmaker.presentation.settings.SettingsActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        enableEdgeToEdge()
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        val but = findViewById<Button>(R.id.search)
-        val butMedia = findViewById<Button>(R.id.media)
-        val butSettings = findViewById<Button>(R.id.settings)
-        but.setOnClickListener(this@MainActivity)
-        butMedia.setOnClickListener {
-            val displayIntent = Intent(this, MediaActivity::class.java)
-            startActivity(displayIntent)
-        }
-        butSettings.setOnClickListener {
-            val displayIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(displayIntent)
-        }
 
-    }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-    override fun onClick(p0: View?) {
-        when (p0?.id) {
-            R.id.search -> {
-                val displayIntent = Intent(this, SearchActivity::class.java)
-                startActivity(displayIntent)
-            }
+        bottomNavigation.setupWithNavController(navController)
+
+        val topLevelDestinations = setOf(
+            R.id.mediaFragment,
+            R.id.searchFragment,
+            R.id.settingsFragment
+        )
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            bottomNavigation.isVisible = destination.id in topLevelDestinations
         }
     }
 }
