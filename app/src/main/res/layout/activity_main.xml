@@ -1,52 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    style="@style/Main.Theme.PlaylistMaker"
-    android:background="?attr/colorOnPrimary"
-    android:orientation="vertical"
-    android:padding="@dimen/icon_margin">
-    <TextView
-        android:layout_width="wrap_content"
+    android:background="@color/colorBackground">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/navHostFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/main_nav_graph"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/bottomNavigationDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?attr/colorOutline"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        style="@style/Widget.MaterialComponents.BottomNavigationView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size"
-        android:fontFamily="@font/ys_display_medium"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="24dp"
-        android:orientation="vertical">
+        android:background="@color/colorBackground"
+        app:itemBackground="@null"
+        app:itemIconTint="@color/bottom_navigation_item_color"
+        app:itemRippleColor="@android:color/transparent"
+        app:itemTextColor="@color/bottom_navigation_item_color"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/main_bottom_navigation_menu" />
 
-        <Button
-            android:id="@+id/search"
-            app:icon="@drawable/ic_search_vector"
-            style="@style/main_button"
-            android:text="@string/title_search" />
-
-
-        <Button
-            android:id="@+id/media"
-            app:icon="@drawable/ic_music_vector"
-            style="@style/main_button"
-            android:text="@string/title_media" />
-<!--            android:background="@drawable/rounded_button"-->
-
-
-        <Button
-            android:id="@+id/settings"
-            app:icon="@drawable/ic_light_mode_24"
-            style="@style/main_button"
-            android:text="@string/title_settings" />
-</LinearLayout>
-</LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

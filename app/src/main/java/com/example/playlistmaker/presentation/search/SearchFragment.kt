@@ -1,7 +1,6 @@
 package com.example.playlistmaker.presentation.search
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,26 +10,24 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.ProgressBar
-import androidx.activity.enableEdgeToEdge
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
-import com.example.playlistmaker.presentation.player.AudioPlayerActivity
+import com.example.playlistmaker.presentation.player.AudioPlayerFragment
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment(R.layout.activity_search) {
+
     private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var flContent: View
     private lateinit var etSearch: EditText
     private lateinit var btnClear: ImageButton
-    private lateinit var ivBack: ImageView
     private lateinit var rvTracks: RecyclerView
     private lateinit var llEmptyPlaceholder: View
     private lateinit var llErrorPlaceholder: View
@@ -40,39 +37,31 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var btnClearHistory: Button
     private lateinit var progressBar: ProgressBar
 
-    private val adapter by lazy { TrackAdapter(onItemClick = { track -> onTrackClicked(track) }) }
+    private val adapter by lazy { TrackAdapter(onItemClick = ::onTrackClicked) }
     private lateinit var historyAdapter: TrackAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        progressBar = findViewById(R.id.progressBar)
-        flContent = findViewById(R.id.flContent)
+        progressBar = view.findViewById(R.id.progressBar)
+        flContent = view.findViewById(R.id.flContent)
 
-        llHistory = findViewById(R.id.llHistory)
-        rvHistory = findViewById(R.id.rvHistory)
-        btnClearHistory = findViewById(R.id.btnClearHistory)
+        llHistory = view.findViewById(R.id.llHistory)
+        rvHistory = view.findViewById(R.id.rvHistory)
+        btnClearHistory = view.findViewById(R.id.btnClearHistory)
 
-        historyAdapter = TrackAdapter(onItemClick = { track -> onTrackClicked(track) })
-        rvHistory.layoutManager = LinearLayoutManager(this)
+        historyAdapter = TrackAdapter(onItemClick = ::onTrackClicked)
+        rvHistory.layoutManager = LinearLayoutManager(requireContext())
         rvHistory.adapter = historyAdapter
 
-        etSearch = findViewById(R.id.etSearch)
-        btnClear = findViewById(R.id.btnClear)
-        ivBack = findViewById(R.id.ivBack)
-        rvTracks = findViewById(R.id.rvTracks)
-        rvTracks.layoutManager = LinearLayoutManager(this)
+        etSearch = view.findViewById(R.id.etSearch)
+        btnClear = view.findViewById(R.id.btnClear)
+        rvTracks = view.findViewById(R.id.rvTracks)
+        rvTracks.layoutManager = LinearLayoutManager(requireContext())
         rvTracks.adapter = adapter
-        llEmptyPlaceholder = findViewById(R.id.llEmptyPlaceholder)
-        llErrorPlaceholder = findViewById(R.id.llErrorPlaceholder)
-        btnRetry = findViewById(R.id.btnRetry)
+        llEmptyPlaceholder = view.findViewById(R.id.llEmptyPlaceholder)
+        llErrorPlaceholder = view.findViewById(R.id.llErrorPlaceholder)
+        btnRetry = view.findViewById(R.id.btnRetry)
 
         etSearch.setOnFocusChangeListener { _, hasFocus ->
             viewModel.onSearchFieldFocusChanged(hasFocus)
@@ -83,7 +72,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString().orEmpty()
@@ -91,13 +80,11 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.onSearchQueryChanged(query)
             }
 
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) = Unit
         })
 
         etSearch.setOnEditorActionListener { _, actionId, _ ->
-            return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE ||
-                actionId == EditorInfo.IME_ACTION_SEARCH
-            ) {
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.onSearchSubmitted()
                 true
             } else {
@@ -117,8 +104,6 @@ class SearchActivity : AppCompatActivity() {
             llErrorPlaceholder.visibility = View.GONE
         }
 
-        ivBack.setOnClickListener { finish() }
-
         btnRetry.setOnClickListener {
             viewModel.onRetrySearch()
         }
@@ -126,14 +111,16 @@ class SearchActivity : AppCompatActivity() {
         observeViewModel()
     }
 
+    override fun onDestroyView() {
+        rvTracks.adapter = null
+        rvHistory.adapter = null
+        super.onDestroyView()
+    }
+
     private fun observeViewModel() {
-        viewModel.state.observe(this) { state ->
-            renderState(state)
-        }
-        viewModel.navigationEvent.observe(this) { event ->
-            event.getContentIfNotHandled()?.let { trackId ->
-                navigateToPlayer(trackId)
-            }
+        viewModel.state.observe(viewLifecycleOwner, ::renderState)
+        viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let(::navigateToPlayer)
         }
     }
 
@@ -159,9 +146,10 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun navigateToPlayer(trackId: Long) {
-        val intent = Intent(this, AudioPlayerActivity::class.java)
-        intent.putExtra(AudioPlayerActivity.EXTRA_TRACK_ID, trackId)
-        startActivity(intent)
+        findNavController().navigate(
+            R.id.action_searchFragment_to_audioPlayerFragment,
+            bundleOf(AudioPlayerFragment.ARG_TRACK_ID to trackId)
+        )
     }
 
     private fun showHistory() {
@@ -175,13 +163,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        (currentFocus ?: window.decorView).windowToken?.let {
-            imm.hideSoftInputFromWindow(it, 0)
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val token = (activity?.currentFocus ?: view)?.windowToken ?: return
+        imm.hideSoftInputFromWindow(token, 0)
     }
 }

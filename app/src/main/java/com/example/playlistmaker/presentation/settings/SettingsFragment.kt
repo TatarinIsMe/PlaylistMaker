@@ -3,44 +3,31 @@ package com.example.playlistmaker.presentation.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
+import android.view.View
 import android.widget.LinearLayout
-import androidx.activity.enableEdgeToEdge
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
 import com.google.android.material.switchmaterial.SwitchMaterial
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment(R.layout.activity_settings) {
 
     private val viewModel: SettingsViewModel by viewModel()
 
     private lateinit var themeSwitcher: SwitchMaterial
     private var isSwitchUpdating = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
-        enableEdgeToEdge()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        themeSwitcher = view.findViewById(R.id.themeSwitcher)
 
-        themeSwitcher = findViewById(R.id.themeSwitcher)
-
-        val back = findViewById<ImageView>(R.id.back_arrow)
-        val shareLayout = findViewById<LinearLayout>(R.id.share_layout)
-        val supportLayout = findViewById<LinearLayout>(R.id.support_layout)
-        val licenceLayout = findViewById<LinearLayout>(R.id.licence_layout)
+        val shareLayout = view.findViewById<LinearLayout>(R.id.share_layout)
+        val supportLayout = view.findViewById<LinearLayout>(R.id.support_layout)
+        val licenceLayout = view.findViewById<LinearLayout>(R.id.licence_layout)
 
         bindObservers()
-
-        back.setOnClickListener { viewModel.onBackClicked() }
 
         shareLayout.setOnClickListener {
             viewModel.onShareClicked(getString(R.string.share_message))
@@ -65,15 +52,15 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun bindObservers() {
-        viewModel.state.observe(this) { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
             isSwitchUpdating = true
             themeSwitcher.isChecked = state.isDarkThemeEnabled
             isSwitchUpdating = false
         }
 
-        viewModel.effect.observe(this) { effect ->
+        viewModel.effect.observe(viewLifecycleOwner) { effect ->
             when (effect) {
-                SettingsEffect.Close -> finish()
+                SettingsEffect.Close -> findNavController().navigateUp()
 
                 is SettingsEffect.Share -> {
                     val intent = Intent(Intent.ACTION_SEND).apply {
