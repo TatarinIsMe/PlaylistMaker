@@ -20,7 +20,7 @@
 
     <View
         android:id="@+id/bottomNavigationDivider"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/colorOutline"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
