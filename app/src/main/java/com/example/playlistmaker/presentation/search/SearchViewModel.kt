@@ -1,14 +1,17 @@
 package com.example.playlistmaker.presentation.search
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.player.interactor.PlayerInteractor
 import com.example.playlistmaker.domain.search.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.domain.search.interactor.SearchInteractor
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
@@ -18,10 +21,11 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var searchRunnable: Runnable? = null
+    private var searchJob: Job? = null
+    private var clickJob: Job? = null
     private var lastQuery = ""
     private var lastFailedQuery = ""
     private var isSearchFieldFocused = false
@@ -40,7 +44,8 @@ class SearchViewModel(
 
     fun onSearchQueryChanged(query: String) {
         lastQuery = query
-        searchRunnable?.let { handler.removeCallbacks(it) }
+        searchJob?.cancel()
+
         if (query.isBlank()) {
             refreshHistoryCache()
             updateState {
@@ -62,8 +67,10 @@ class SearchViewModel(
             )
         }
 
-        searchRunnable = Runnable { executeSearch(query) }
-        handler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_DELAY)
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            executeSearch(query)
+        }
     }
 
     fun onSearchFieldFocusChanged(focused: Boolean) {
@@ -74,14 +81,20 @@ class SearchViewModel(
     fun onSearchSubmitted() {
         val query = lastQuery.trim()
         if (query.isBlank()) return
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        executeSearch(query)
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            executeSearch(query)
+        }
     }
 
     fun onRetrySearch() {
         if (lastFailedQuery.isBlank()) return
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        executeSearch(lastFailedQuery)
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            executeSearch(lastFailedQuery)
+        }
     }
 
     fun onTrackSelected(track: Track) {
@@ -93,18 +106,16 @@ class SearchViewModel(
         refreshHistoryCache()
         _navigationEvent.value = Event(track.trackId)
 
-        handler.postDelayed({ isClickAllowed = true }, 1000L)
+        clickJob?.cancel()
+        clickJob = viewModelScope.launch {
+            delay(CLICK_DEBOUNCE_DELAY)
+            isClickAllowed = true
+        }
     }
 
     fun onClearHistory() {
         historyInteractor.clearHistory()
         refreshHistoryCache()
-    }
-
-    override fun onCleared() {
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        handler.removeCallbacksAndMessages(null)
-        super.onCleared()
     }
 
     private fun refreshHistoryCache() {
@@ -120,8 +131,7 @@ class SearchViewModel(
     private fun shouldShowHistory(): Boolean =
         isSearchFieldFocused && lastQuery.isBlank() && historyCache.isNotEmpty()
 
-    private fun executeSearch(query: String) {
-        searchRunnable = null
+    private suspend fun executeSearch(query: String) {
         lastFailedQuery = query
         updateState {
             copy(
@@ -133,10 +143,10 @@ class SearchViewModel(
             )
         }
 
-        searchInteractor.searchTracks(query) { result ->
+        searchInteractor.searchTracks(query).collect { result ->
             result.fold(
                 onSuccess = { tracks ->
-                    postState {
+                    updateState {
                         copy(
                             isLoading = false,
                             tracks = tracks,
@@ -146,7 +156,7 @@ class SearchViewModel(
                     }
                 },
                 onFailure = {
-                    postState {
+                    updateState {
                         copy(
                             isLoading = false,
                             tracks = emptyList(),
@@ -162,10 +172,5 @@ class SearchViewModel(
     private fun updateState(update: SearchUiState.() -> SearchUiState) {
         val current = _state.value ?: SearchUiState()
         _state.value = current.update()
-    }
-
-    private fun postState(update: SearchUiState.() -> SearchUiState) {
-        val current = _state.value ?: SearchUiState()
-        _state.postValue(current.update())
     }
 }

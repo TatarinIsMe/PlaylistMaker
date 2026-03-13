@@ -1,14 +1,16 @@
 package com.example.playlistmaker.presentation.player
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.player.interactor.PlayerInteractor
-
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
     trackId: Long,
@@ -16,19 +18,16 @@ class AudioPlayerViewModel(
 ) : ViewModel() {
 
     private val track: Track = playerInteractor.getTrack(trackId)
-        ?: throw IllegalStateException("Track not found for id $trackId")
 
     companion object {
         private const val UPDATE_PROGRESS_DELAY = 300L
     }
 
-    private val handler = Handler(Looper.getMainLooper())
-
     private val _state = MutableLiveData(createInitialState(track))
     val state: LiveData<PlayerState> = _state
 
     private var mediaPlayer: MediaPlayer? = null
-    private var progressRunnable: Runnable? = null
+    private var progressJob: Job? = null
     private var isPrepared = false
 
     init {
@@ -51,7 +50,6 @@ class AudioPlayerViewModel(
                 )
             }
         } else {
-            // если трек уже отыграл до конца — начинаем заново
             if (player.currentPosition >= player.duration) {
                 player.seekTo(0)
                 updateState { copy(progressText = formatTime(0L)) }
@@ -83,8 +81,6 @@ class AudioPlayerViewModel(
         mediaPlayer = null
         super.onCleared()
     }
-
-    // ------------------ private ------------------
 
     private fun preparePlayer() {
         val url = track.previewUrl
@@ -118,18 +114,18 @@ class AudioPlayerViewModel(
     private fun startProgressUpdates() {
         stopProgressUpdates()
 
-        progressRunnable = Runnable {
-            val player = mediaPlayer ?: return@Runnable
-            updateState { copy(progressText = formatTime(player.currentPosition.toLong())) }
-            handler.postDelayed(progressRunnable!!, UPDATE_PROGRESS_DELAY)
+        progressJob = viewModelScope.launch {
+            while (isActive) {
+                delay(UPDATE_PROGRESS_DELAY)
+                val player = mediaPlayer ?: break
+                updateState { copy(progressText = formatTime(player.currentPosition.toLong())) }
+            }
         }
-
-        handler.postDelayed(progressRunnable!!, UPDATE_PROGRESS_DELAY)
     }
 
     private fun stopProgressUpdates() {
-        progressRunnable?.let { handler.removeCallbacks(it) }
-        progressRunnable = null
+        progressJob?.cancel()
+        progressJob = null
     }
 
     private fun updateState(update: PlayerState.() -> PlayerState) {

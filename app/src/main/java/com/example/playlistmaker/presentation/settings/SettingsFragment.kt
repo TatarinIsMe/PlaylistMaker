@@ -3,37 +3,42 @@ package com.example.playlistmaker.presentation.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsFragment : Fragment(R.layout.activity_settings) {
+class SettingsFragment : Fragment() {
 
     private val viewModel: SettingsViewModel by viewModel()
-
-    private lateinit var themeSwitcher: SwitchMaterial
+    private var _binding: ActivitySettingsBinding? = null
+    private val binding: ActivitySettingsBinding
+        get() = _binding ?: error("Binding is only valid between onCreateView and onDestroyView")
     private var isSwitchUpdating = false
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = ActivitySettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        themeSwitcher = view.findViewById(R.id.themeSwitcher)
-
-        val shareLayout = view.findViewById<LinearLayout>(R.id.share_layout)
-        val supportLayout = view.findViewById<LinearLayout>(R.id.support_layout)
-        val licenceLayout = view.findViewById<LinearLayout>(R.id.licence_layout)
-
         bindObservers()
 
-        shareLayout.setOnClickListener {
+        binding.shareLayout.setOnClickListener {
             viewModel.onShareClicked(getString(R.string.share_message))
         }
 
-        supportLayout.setOnClickListener {
+        binding.supportLayout.setOnClickListener {
             viewModel.onSupportClicked(
                 email = getString(R.string.support_email),
                 subject = getString(R.string.support_subject),
@@ -41,20 +46,25 @@ class SettingsFragment : Fragment(R.layout.activity_settings) {
             )
         }
 
-        licenceLayout.setOnClickListener {
+        binding.licenceLayout.setOnClickListener {
             viewModel.onLicenceClicked(getString(R.string.licence_url))
         }
 
-        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+        binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
             if (isSwitchUpdating) return@setOnCheckedChangeListener
             viewModel.onDarkThemeToggled(checked)
         }
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     private fun bindObservers() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             isSwitchUpdating = true
-            themeSwitcher.isChecked = state.isDarkThemeEnabled
+            binding.themeSwitcher.isChecked = state.isDarkThemeEnabled
             isSwitchUpdating = false
         }
 
