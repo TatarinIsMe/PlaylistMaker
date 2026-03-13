@@ -1,28 +1,38 @@
 package com.example.playlistmaker.presentation.media
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.widget.ViewPager2
 import com.example.playlistmaker.R
-import com.google.android.material.tabs.TabLayout
+import com.example.playlistmaker.databinding.ActivityMediaBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MediaFragment : Fragment(R.layout.activity_media) {
+class MediaFragment : Fragment() {
     private val viewModel: MediaViewModel by viewModel()
+    private var _binding: ActivityMediaBinding? = null
+    private val binding: ActivityMediaBinding
+        get() = _binding ?: error("Binding is only valid between onCreateView and onDestroyView")
     private var tabLayoutMediator: TabLayoutMediator? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = ActivityMediaBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewPager = view.findViewById<ViewPager2>(R.id.viewPager)
-        val tabLayout = view.findViewById<TabLayout>(R.id.tabLayout)
+        binding.viewPager.adapter = MediaPagerAdapter(this)
+        binding.viewPager.offscreenPageLimit = 1
 
-        viewPager.adapter = MediaPagerAdapter(this)
-        viewPager.offscreenPageLimit = 1
-
-        tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        tabLayoutMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.tab_favorites)
                 else -> getString(R.string.tab_playlists)
@@ -33,6 +43,8 @@ class MediaFragment : Fragment(R.layout.activity_media) {
     override fun onDestroyView() {
         tabLayoutMediator?.detach()
         tabLayoutMediator = null
+        binding.viewPager.adapter = null
+        _binding = null
         super.onDestroyView()
     }
 }

@@ -1,41 +1,29 @@
 package com.example.playlistmaker.data.search.repository
 
 import com.example.playlistmaker.data.search.model.TrackDto
-import com.example.playlistmaker.data.search.model.TracksSearchResponse
 import com.example.playlistmaker.data.search.model.toTrack
 import com.example.playlistmaker.data.search.network.ItunesApi
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.search.repository.TracksRepository
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlin.coroutines.cancellation.CancellationException
 
 class TracksRepositoryImpl(
     private val itunesApi: ItunesApi
 ) : TracksRepository {
 
-    override fun searchTracks(query: String, callback: (Result<List<Track>>) -> Unit) {
-        itunesApi.searchTracks(query).enqueue(object : Callback<TracksSearchResponse> {
-            override fun onResponse(
-                call: Call<TracksSearchResponse>,
-                response: Response<TracksSearchResponse>
-            ) {
-                if (!response.isSuccessful) {
-                    callback(Result.failure(RuntimeException("Request failed with code ${response.code()}")))
-                    return
-                }
-
-                val tracks = response.body()
-                    ?.results
-                    ?.map(TrackDto::toTrack)
-                    ?: emptyList()
-
-                callback(Result.success(tracks))
-            }
-
-            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
-                callback(Result.failure(t))
-            }
-        })
-    }
+    override fun searchTracks(query: String): Flow<Result<List<Track>>> = flow {
+        try {
+            val tracks = itunesApi.searchTracks(query)
+                .results
+                .map(TrackDto::toTrack)
+            emit(Result.success(tracks))
+        } catch (e: Throwable) {
+            if (e is CancellationException) throw e
+            emit(Result.failure(e))
+        }
+    }.flowOn(Dispatchers.IO)
 }
