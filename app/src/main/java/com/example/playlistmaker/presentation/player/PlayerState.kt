@@ -17,5 +17,6 @@ data class PlayerState(
 
     val isPlayEnabled: Boolean = false,
     val isPrepared: Boolean = false,
-    val isPlaying: Boolean = false
+    val isPlaying: Boolean = false,
+    val isFavorite: Boolean = false
 )

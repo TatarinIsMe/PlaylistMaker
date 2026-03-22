@@ -102,9 +102,12 @@ class SearchViewModel(
 
         isClickAllowed = false
         playerInteractor.saveTrack(track)
-        historyInteractor.addTrack(track)
-        refreshHistoryCache()
         _navigationEvent.value = Event(track.trackId)
+
+        viewModelScope.launch {
+            historyInteractor.addTrack(track)
+            loadHistoryCache()
+        }
 
         clickJob?.cancel()
         clickJob = viewModelScope.launch {
@@ -114,11 +117,19 @@ class SearchViewModel(
     }
 
     fun onClearHistory() {
-        historyInteractor.clearHistory()
-        refreshHistoryCache()
+        viewModelScope.launch {
+            historyInteractor.clearHistory()
+            loadHistoryCache()
+        }
     }
 
     private fun refreshHistoryCache() {
+        viewModelScope.launch {
+            loadHistoryCache()
+        }
+    }
+
+    private suspend fun loadHistoryCache() {
         historyCache = historyInteractor.getHistory()
         updateState {
             copy(

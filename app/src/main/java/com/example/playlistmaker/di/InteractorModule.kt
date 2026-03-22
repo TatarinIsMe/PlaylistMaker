@@ -1,5 +1,7 @@
 package com.example.playlistmaker.di
 
+import com.example.playlistmaker.domain.media.interactor.FavoritesInteractor
+import com.example.playlistmaker.domain.media.interactor.FavoritesInteractorImpl
 import com.example.playlistmaker.domain.model.TrackCache
 import com.example.playlistmaker.domain.player.interactor.PlayerInteractor
 import com.example.playlistmaker.domain.player.interactor.PlayerInteractorImpl
@@ -15,6 +17,7 @@ val interactorModule = module {
     single { TrackCache() }
     single<SearchInteractor> { SearchInteractorImpl(get()) }
     single<SearchHistoryInteractor> { SearchHistoryInteractorImpl(get()) }
+    single<FavoritesInteractor> { FavoritesInteractorImpl(get()) }
     single<PlayerInteractor> { PlayerInteractorImpl(get()) }
     single<SettingsInteractor> { SettingsInteractorImpl(get()) }
 }
