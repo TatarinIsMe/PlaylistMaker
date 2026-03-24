@@ -6,8 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.media.interactor.FavoritesInteractor
+import com.example.playlistmaker.domain.media.interactor.PlaylistsInteractor
+import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.player.interactor.PlayerInteractor
+import com.example.playlistmaker.SingleLiveEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -16,7 +19,8 @@ import kotlinx.coroutines.launch
 class AudioPlayerViewModel(
     trackId: Long,
     private val playerInteractor: PlayerInteractor,
-    private val favoritesInteractor: FavoritesInteractor
+    private val favoritesInteractor: FavoritesInteractor,
+    private val playlistsInteractor: PlaylistsInteractor
 ) : ViewModel() {
 
     private val track: Track = playerInteractor.getTrack(trackId)
@@ -27,6 +31,14 @@ class AudioPlayerViewModel(
 
     private val _state = MutableLiveData(createInitialState(track))
     val state: LiveData<PlayerState> = _state
+    private val _playlists = MutableLiveData<List<Playlist>>(emptyList())
+    val playlists: LiveData<List<Playlist>> = _playlists
+
+    private val _addToPlaylistResult = SingleLiveEvent<AddToPlaylistResult>()
+    val addToPlaylistResult: LiveData<AddToPlaylistResult> = _addToPlaylistResult
+
+    private val _openCreatePlaylistEvent = SingleLiveEvent<Unit>()
+    val openCreatePlaylistEvent: LiveData<Unit> = _openCreatePlaylistEvent
 
     private var mediaPlayer: MediaPlayer? = null
     private var progressJob: Job? = null
@@ -35,6 +47,7 @@ class AudioPlayerViewModel(
     init {
         preparePlayer()
         loadFavoriteState()
+        observePlaylists()
     }
 
     fun onPlayPauseClicked() {
@@ -93,6 +106,24 @@ class AudioPlayerViewModel(
         }
     }
 
+    fun onPlaylistSelected(playlist: Playlist) {
+        if (playlist.trackIds.contains(track.trackId)) {
+            _addToPlaylistResult.value = AddToPlaylistResult.AlreadyAdded(playlist.name)
+            return
+        }
+
+        viewModelScope.launch {
+            val added = playlistsInteractor.addTrackToPlaylist(track, playlist)
+            if (added) {
+                _addToPlaylistResult.value = AddToPlaylistResult.Added(playlist.name)
+            }
+        }
+    }
+
+    fun onNewPlaylistClicked() {
+        _openCreatePlaylistEvent.value = Unit
+    }
+
     override fun onCleared() {
         stopProgressUpdates()
         mediaPlayer?.release()
@@ -134,6 +165,14 @@ class AudioPlayerViewModel(
             val isFavorite = favoritesInteractor.isFavorite(track.trackId)
             track.isFavorite = isFavorite
             updateState { copy(isFavorite = isFavorite) }
+        }
+    }
+
+    private fun observePlaylists() {
+        viewModelScope.launch {
+            playlistsInteractor.getPlaylists().collect { playlists ->
+                _playlists.value = playlists
+            }
         }
     }
 

@@ -25,4 +25,12 @@
 
     <color name="play_icon_tint">#FFFFFF</color>
 
+    <color name="create_playlist_screen_bg">#F3F3F3</color>
+    <color name="create_playlist_text_primary">#1A1A1A</color>
+    <color name="create_playlist_hint">#6F6F6F</color>
+    <color name="create_playlist_input_bg">#F3F3F3</color>
+    <color name="create_playlist_input_stroke">#BDBDBD</color>
+    <color name="create_playlist_placeholder_stroke">#C7C7CC</color>
+    <color name="create_playlist_placeholder_icon">#AEAFB4</color>
+
 </resources>

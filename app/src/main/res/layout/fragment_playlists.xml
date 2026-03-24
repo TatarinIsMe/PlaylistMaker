@@ -28,29 +28,44 @@
         android:paddingBottom="10dp"
         app:cornerRadius="20dp" />
 
-    <LinearLayout
-        android:id="@+id/llPlaylistsPlaceholder"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:layout_marginTop="16dp"
+        android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_search_nothing_120"
-            android:contentDescription="@null"
-            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPlaylists"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="4dp"
+            android:visibility="gone"
+            tools:itemCount="4"
+            tools:listitem="@layout/item_playlist" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/playlists_placeholder"
-            android:textColor="?attr/colorOnBackground"
-            android:textSize="16sp"
-            android:fontFamily="@font/ys_display_medium"
-            android:gravity="center" />
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llPlaylistsPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_search_nothing_120" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/ys_display_medium"
+                android:gravity="center"
+                android:text="@string/playlists_placeholder"
+                android:textColor="?attr/colorOnBackground"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
