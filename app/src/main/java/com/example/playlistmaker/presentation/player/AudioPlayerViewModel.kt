@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.domain.media.interactor.FavoritesInteractor
 import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.domain.player.interactor.PlayerInteractor
 import kotlinx.coroutines.Job
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
     trackId: Long,
-    private val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor,
+    private val favoritesInteractor: FavoritesInteractor
 ) : ViewModel() {
 
     private val track: Track = playerInteractor.getTrack(trackId)
@@ -32,6 +34,7 @@ class AudioPlayerViewModel(
 
     init {
         preparePlayer()
+        loadFavoriteState()
     }
 
     fun onPlayPauseClicked() {
@@ -75,6 +78,21 @@ class AudioPlayerViewModel(
         }
     }
 
+    fun onFavoriteClicked() {
+        viewModelScope.launch {
+            val isFavoriteNow = _state.value?.isFavorite ?: track.isFavorite
+
+            if (isFavoriteNow) {
+                favoritesInteractor.removeTrack(track)
+            } else {
+                favoritesInteractor.addTrack(track)
+            }
+
+            track.isFavorite = !isFavoriteNow
+            updateState { copy(isFavorite = track.isFavorite) }
+        }
+    }
+
     override fun onCleared() {
         stopProgressUpdates()
         mediaPlayer?.release()
@@ -111,8 +129,16 @@ class AudioPlayerViewModel(
         }
     }
 
+    private fun loadFavoriteState() {
+        viewModelScope.launch {
+            val isFavorite = favoritesInteractor.isFavorite(track.trackId)
+            track.isFavorite = isFavorite
+            updateState { copy(isFavorite = isFavorite) }
+        }
+    }
+
     private fun startProgressUpdates() {
-        stopProgressUpdates()
+        progressJob?.cancel()
 
         progressJob = viewModelScope.launch {
             while (isActive) {
@@ -155,7 +181,8 @@ class AudioPlayerViewModel(
 
             isPlayEnabled = !track.previewUrl.isNullOrBlank(),
             isPrepared = false,
-            isPlaying = false
+            isPlaying = false,
+            isFavorite = track.isFavorite
         )
     }
 

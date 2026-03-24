@@ -43,6 +43,7 @@ class AudioPlayerFragment : Fragment() {
             findNavController().navigateUp()
         }
         binding.btnPlay.setOnClickListener { viewModel.onPlayPauseClicked() }
+        binding.btnFavorite.setOnClickListener { viewModel.onFavoriteClicked() }
 
         bindObservers()
     }
@@ -76,6 +77,9 @@ class AudioPlayerFragment : Fragment() {
 
             binding.btnPlay.isEnabled = state.isPlayEnabled
             binding.btnPlay.setImageResource(if (state.isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
+            binding.btnFavorite.setImageResource(
+                if (state.isFavorite) R.drawable.ic_favourite_red_25 else R.drawable.ic_favourite_25
+            )
 
             Glide.with(this)
                 .load(state.coverUrl)

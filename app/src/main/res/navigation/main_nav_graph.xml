@@ -7,7 +7,11 @@
     <fragment
         android:id="@+id/mediaFragment"
         android:name="com.example.playlistmaker.presentation.media.MediaFragment"
-        android:label="@string/title_media" />
+        android:label="@string/title_media">
+        <action
+            android:id="@+id/action_mediaFragment_to_audioPlayerFragment"
+            app:destination="@id/audioPlayerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchFragment"
