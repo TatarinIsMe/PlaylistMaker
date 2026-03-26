@@ -15,8 +15,6 @@ data class PlaylistEntity(
     val description: String?,
     @ColumnInfo(name = "cover_path")
     val coverPath: String?,
-    @ColumnInfo(name = "track_ids_json")
-    val trackIdsJson: String,
     @ColumnInfo(name = "tracks_count")
     val tracksCount: Int
 )

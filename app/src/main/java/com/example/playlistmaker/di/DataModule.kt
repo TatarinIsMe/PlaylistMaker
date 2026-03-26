@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.MIGRATION_1_2
 import com.example.playlistmaker.data.db.MIGRATION_2_3
+import com.example.playlistmaker.data.db.MIGRATION_3_4
 import com.example.playlistmaker.data.search.network.ItunesApi
 import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
@@ -23,7 +24,7 @@ val dataModule = module {
             AppDatabase::class.java,
             DATABASE_NAME
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
     }
 

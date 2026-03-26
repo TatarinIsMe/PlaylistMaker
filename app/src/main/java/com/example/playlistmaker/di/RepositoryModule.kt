@@ -17,6 +17,6 @@ val repositoryModule = module {
     single<TracksRepository> { TracksRepositoryImpl(get(), get()) }
     single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(named("search_prefs")), get(), get()) }
     single<FavoritesRepository> { FavoritesRepositoryImpl(get()) }
-    single<PlaylistsRepository> { PlaylistsRepositoryImpl(get(), get(), get()) }
+    single<PlaylistsRepository> { PlaylistsRepositoryImpl(get(), get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(get(named("settings_prefs"))) }
 }

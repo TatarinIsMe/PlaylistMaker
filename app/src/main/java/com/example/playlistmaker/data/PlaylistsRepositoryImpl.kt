@@ -5,13 +5,13 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.PlaylistEntity
+import com.example.playlistmaker.data.db.PlaylistTrackCrossRefEntity
 import com.example.playlistmaker.data.db.toPlaylistTrackEntity
 import com.example.playlistmaker.data.db.toDomain
 import com.example.playlistmaker.data.db.toEntity
 import com.example.playlistmaker.domain.media.repository.PlaylistsRepository
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
-import com.google.gson.Gson
 import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,49 +22,61 @@ import java.io.FileOutputStream
 
 class PlaylistsRepositoryImpl(
     private val database: AppDatabase,
-    private val context: Context,
-    private val gson: Gson
+    private val context: Context
 ) : PlaylistsRepository {
 
     override suspend fun createPlaylist(name: String, description: String?, coverUri: String?): Long {
+        val savedCoverPath = coverUri?.let { uri ->
+            withContext(Dispatchers.IO) {
+                saveCoverToPrivateStorage(Uri.parse(uri))
+            }
+        }
+
+        val playlist = PlaylistEntity(
+            name = name,
+            description = description,
+            coverPath = savedCoverPath,
+            tracksCount = 0
+        )
+
         return withContext(Dispatchers.IO) {
-            val savedCoverPath = coverUri?.let { saveCoverToPrivateStorage(Uri.parse(it)) }
-            val playlist = PlaylistEntity(
-                name = name,
-                description = description,
-                coverPath = savedCoverPath,
-                trackIdsJson = gson.toJson(emptyList<Long>()),
-                tracksCount = 0
-            )
             database.playlistDao().insertPlaylist(playlist)
         }
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {
+        val playlistEntity = playlist.toEntity()
         withContext(Dispatchers.IO) {
-            database.playlistDao().updatePlaylist(playlist.toEntity(gson))
+            database.playlistDao().updatePlaylist(playlistEntity)
         }
     }
 
     override suspend fun addTrackToPlaylist(track: Track, playlist: Playlist): Boolean {
         return withContext(Dispatchers.IO) {
             runCatching {
+                var isAdded = false
                 database.withTransaction {
-                    val updatedPlaylist = playlist.copy(
-                        trackIds = playlist.trackIds + track.trackId,
-                        tracksCount = playlist.tracksCount + 1
-                    )
-                    database.playlistDao().updatePlaylist(updatedPlaylist.toEntity(gson))
                     database.playlistTrackDao().insertTrack(track.toPlaylistTrackEntity())
+                    val insertedRefId = database.playlistDao().insertPlaylistTrackCrossRef(
+                        PlaylistTrackCrossRefEntity(
+                            playlistId = playlist.playlistId,
+                            trackId = track.trackId
+                        )
+                    )
+                    if (insertedRefId != -1L) {
+                        database.playlistDao().incrementTracksCount(playlist.playlistId)
+                        isAdded = true
+                    }
                 }
-            }.isSuccess
+                isAdded
+            }.getOrDefault(false)
         }
     }
 
     override fun getPlaylists(): Flow<List<Playlist>> {
         return database.playlistDao()
-            .getPlaylists()
-            .map { playlists -> playlists.map { it.toDomain(gson) } }
+            .getPlaylistsWithTrackRefs()
+            .map { playlists -> playlists.map { it.toDomain() } }
     }
 
     private fun saveCoverToPrivateStorage(imageUri: Uri): String? {

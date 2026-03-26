@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.player
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,7 +10,6 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ItemBottomSheetPlaylistBinding
 import com.example.playlistmaker.domain.model.Playlist
-import java.io.File
 
 class BottomSheetPlaylistsAdapter(
     private val onItemClick: (Playlist) -> Unit
@@ -47,15 +47,15 @@ class BottomSheetPlaylistsAdapter(
                 playlist.tracksCount
             )
 
-            val coverPath = playlist.coverPath
-            if (coverPath.isNullOrBlank()) {
+            val coverUri = playlist.coverUri
+            if (coverUri.isNullOrBlank()) {
                 Glide.with(binding.root).clear(binding.ivPlaylistCover)
                 binding.ivPlaylistCover.setImageResource(R.drawable.ic_placeholder_45)
                 return
             }
 
             Glide.with(binding.root)
-                .load(File(coverPath))
+                .load(Uri.parse(coverUri))
                 .placeholder(R.drawable.ic_placeholder_45)
                 .error(R.drawable.ic_placeholder_45)
                 .centerCrop()

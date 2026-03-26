@@ -33,7 +33,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/ys_display_medium"
             android:maxLines="1"
-            android:textColor="?attr/colorOnBackground"
+            android:textColor="@color/playlist_item_name_text"
             android:textSize="16sp" />
 
         <TextView
@@ -44,7 +44,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/ys_display_regular"
             android:maxLines="1"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="12sp" />
+            android:textColor="@color/playlist_item_count_text"
+            android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

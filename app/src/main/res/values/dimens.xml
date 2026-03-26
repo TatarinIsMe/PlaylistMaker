@@ -17,5 +17,6 @@
     <dimen name="stroke_width">1dp</dimen>
     <dimen name="image_size">45dp</dimen>
     <dimen name="edit_search_param">8dp</dimen>
+    <dimen name="create_playlist_toast_bottom_offset">16dp</dimen>
 
 </resources>

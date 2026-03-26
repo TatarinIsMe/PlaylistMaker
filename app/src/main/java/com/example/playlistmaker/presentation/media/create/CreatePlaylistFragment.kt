@@ -2,10 +2,12 @@ package com.example.playlistmaker.presentation.media.create
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
@@ -122,12 +124,25 @@ class CreatePlaylistFragment : Fragment() {
     }
 
     private fun onPlaylistCreated(playlistName: String) {
-        Toast.makeText(
-            requireContext(),
-            getString(R.string.playlist_created, playlistName),
-            Toast.LENGTH_SHORT
-        ).show()
+        showPlaylistCreatedToast(getString(R.string.playlist_created, playlistName))
         findNavController().navigateUp()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun showPlaylistCreatedToast(message: String) {
+        val toastView = layoutInflater.inflate(R.layout.view_create_playlist_toast, null)
+        toastView.findViewById<TextView>(R.id.tvToastMessage).text = message
+
+        Toast(requireContext().applicationContext).apply {
+            duration = Toast.LENGTH_SHORT
+            setView(toastView)
+            setGravity(
+                Gravity.BOTTOM or Gravity.FILL_HORIZONTAL,
+                0,
+                resources.getDimensionPixelSize(R.dimen.create_playlist_toast_bottom_offset)
+            )
+            show()
+        }
     }
 
     private fun handleCloseRequest() {
