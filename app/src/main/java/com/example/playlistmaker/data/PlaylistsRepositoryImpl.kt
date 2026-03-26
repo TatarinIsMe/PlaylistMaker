@@ -3,8 +3,8 @@ package com.example.playlistmaker.data
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.db.PlaylistEntity
+import com.example.playlistmaker.data.db.PlaylistDao
 import com.example.playlistmaker.data.db.PlaylistTrackCrossRefEntity
 import com.example.playlistmaker.data.db.toPlaylistTrackEntity
 import com.example.playlistmaker.data.db.toDomain
@@ -12,16 +12,16 @@ import com.example.playlistmaker.data.db.toEntity
 import com.example.playlistmaker.domain.media.repository.PlaylistsRepository
 import com.example.playlistmaker.domain.model.Playlist
 import com.example.playlistmaker.domain.model.Track
-import androidx.room.withTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
 class PlaylistsRepositoryImpl(
-    private val database: AppDatabase,
+    private val playlistDao: PlaylistDao,
     private val context: Context
 ) : PlaylistsRepository {
 
@@ -40,43 +40,34 @@ class PlaylistsRepositoryImpl(
         )
 
         return withContext(Dispatchers.IO) {
-            database.playlistDao().insertPlaylist(playlist)
+            playlistDao.insertPlaylist(playlist)
         }
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {
         val playlistEntity = playlist.toEntity()
         withContext(Dispatchers.IO) {
-            database.playlistDao().updatePlaylist(playlistEntity)
+            playlistDao.updatePlaylist(playlistEntity)
         }
     }
 
     override suspend fun addTrackToPlaylist(track: Track, playlist: Playlist): Boolean {
         return withContext(Dispatchers.IO) {
-            runCatching {
-                var isAdded = false
-                database.withTransaction {
-                    database.playlistTrackDao().insertTrack(track.toPlaylistTrackEntity())
-                    val insertedRefId = database.playlistDao().insertPlaylistTrackCrossRef(
-                        PlaylistTrackCrossRefEntity(
-                            playlistId = playlist.playlistId,
-                            trackId = track.trackId
-                        )
-                    )
-                    if (insertedRefId != -1L) {
-                        database.playlistDao().incrementTracksCount(playlist.playlistId)
-                        isAdded = true
-                    }
-                }
-                isAdded
-            }.getOrDefault(false)
+            playlistDao.addTrackToPlaylist(
+                track = track.toPlaylistTrackEntity(),
+                crossRef = PlaylistTrackCrossRefEntity(
+                    playlistId = playlist.playlistId,
+                    trackId = track.trackId
+                )
+            )
         }
     }
 
     override fun getPlaylists(): Flow<List<Playlist>> {
-        return database.playlistDao()
+        return playlistDao
             .getPlaylistsWithTrackRefs()
             .map { playlists -> playlists.map { it.toDomain() } }
+            .distinctUntilChanged()
     }
 
     private fun saveCoverToPrivateStorage(imageUri: Uri): String? {

@@ -20,8 +20,23 @@ interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlaylistTrackCrossRef(crossRef: PlaylistTrackCrossRefEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertTrack(track: PlaylistTrackEntity)
+
     @Query("UPDATE playlists SET tracks_count = tracks_count + 1 WHERE playlist_id = :playlistId")
     suspend fun incrementTracksCount(playlistId: Long)
+
+    @Transaction
+    suspend fun addTrackToPlaylist(
+        track: PlaylistTrackEntity,
+        crossRef: PlaylistTrackCrossRefEntity
+    ): Boolean {
+        insertTrack(track)
+        val insertedRefId = insertPlaylistTrackCrossRef(crossRef)
+        if (insertedRefId == -1L) return false
+        incrementTracksCount(crossRef.playlistId)
+        return true
+    }
 
     @Transaction
     @Query("SELECT * FROM playlists ORDER BY playlist_id DESC")
