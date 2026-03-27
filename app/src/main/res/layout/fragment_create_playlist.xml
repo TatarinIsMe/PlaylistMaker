@@ -49,13 +49,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivPlaceholder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/content_desc_playlist_cover"
             android:scaleType="center"
-            android:src="@drawable/ic_playlist_add_80" />
+            android:src="@drawable/ic_playlist_add_80"
+            app:shapeAppearanceOverlay="@style/Shape.CreatePlaylistCover" />
     </FrameLayout>
 
     <EditText
