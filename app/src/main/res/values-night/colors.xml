@@ -16,4 +16,16 @@
 
         <color name="play_icon_tint">#1A1B22</color>
 
+        <color name="create_playlist_screen_bg">#1A1B22</color>
+        <color name="create_playlist_text_primary">#FFFFFF</color>
+        <color name="create_playlist_hint">#FFFFFF</color>
+        <color name="create_playlist_input_bg">@color/create_playlist_screen_bg</color>
+        <color name="create_playlist_input_stroke">#FFFFFF</color>
+        <color name="create_playlist_placeholder_stroke">#AEAFB4</color>
+        <color name="create_playlist_placeholder_icon">#FFFFFF</color>
+        <color name="create_playlist_toast_bg">#FFFFFF</color>
+        <color name="create_playlist_toast_text">#000000</color>
+        <color name="playlist_item_name_text">#FFFFFF</color>
+        <color name="playlist_item_count_text">#FFFFFF</color>
+
 </resources>

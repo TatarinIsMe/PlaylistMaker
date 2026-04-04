@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="7dp"
+    android:paddingEnd="8dp">
+
+    <TextView
+        android:id="@+id/tvToastMessage"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_create_playlist_toast"
+        android:fontFamily="@font/ys_display_regular"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/create_playlist_toast_text"
+        android:textSize="14sp" />
+
+</FrameLayout>
