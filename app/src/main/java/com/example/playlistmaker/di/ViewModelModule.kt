@@ -7,6 +7,7 @@ import com.example.playlistmaker.presentation.media.create.CreatePlaylistViewMod
 import com.example.playlistmaker.presentation.media.FavoritesViewModel
 import com.example.playlistmaker.presentation.media.MediaViewModel
 import com.example.playlistmaker.presentation.media.PlaylistsViewModel
+import com.example.playlistmaker.presentation.media.playlist.PlaylistViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -16,6 +17,7 @@ val viewModelModule = module {
     viewModel { (trackId: Long) -> AudioPlayerViewModel(trackId, get(), get(), get()) }
     viewModel { MediaViewModel() }
     viewModel { PlaylistsViewModel(get()) }
-    viewModel { CreatePlaylistViewModel(get()) }
+    viewModel { (editablePlaylistId: Long?) -> CreatePlaylistViewModel(get(), editablePlaylistId) }
+    viewModel { (playlistId: Long) -> PlaylistViewModel(playlistId, get(), get()) }
     viewModel { FavoritesViewModel(get(), get()) }
 }

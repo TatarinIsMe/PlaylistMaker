@@ -11,12 +11,14 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ItemPlaylistBinding
 import com.example.playlistmaker.domain.model.Playlist
 
-class PlaylistsAdapter : ListAdapter<Playlist, PlaylistsAdapter.PlaylistViewHolder>(DiffCallback) {
+class PlaylistsAdapter(
+    private val onItemClick: (Playlist) -> Unit
+) : ListAdapter<Playlist, PlaylistsAdapter.PlaylistViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemPlaylistBinding.inflate(inflater, parent, false)
-        return PlaylistViewHolder(binding)
+        return PlaylistViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
@@ -24,10 +26,20 @@ class PlaylistsAdapter : ListAdapter<Playlist, PlaylistsAdapter.PlaylistViewHold
     }
 
     class PlaylistViewHolder(
-        private val binding: ItemPlaylistBinding
+        private val binding: ItemPlaylistBinding,
+        private val onItemClick: (Playlist) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private var currentPlaylist: Playlist? = null
+
+        init {
+            binding.root.setOnClickListener {
+                currentPlaylist?.let(onItemClick)
+            }
+        }
+
         fun bind(playlist: Playlist) {
+            currentPlaylist = playlist
             binding.tvPlaylistName.text = playlist.name
             binding.tvPlaylistTracksCount.text = itemView.resources.getQuantityString(
                 R.plurals.playlist_tracks_count,

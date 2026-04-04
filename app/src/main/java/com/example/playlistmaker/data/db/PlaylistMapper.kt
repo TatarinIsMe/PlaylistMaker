@@ -21,6 +21,15 @@ fun PlaylistWithTrackRefs.toDomain(): Playlist = Playlist(
     tracksCount = playlist.tracksCount
 )
 
+fun PlaylistEntity.toDomain(trackIds: List<Long>): Playlist = Playlist(
+    playlistId = playlistId,
+    name = name,
+    description = description,
+    coverUri = coverUriFromPath(coverPath),
+    trackIds = trackIds,
+    tracksCount = tracksCount
+)
+
 private fun coverUriFromPath(coverPath: String?): String? {
     if (coverPath.isNullOrBlank()) return null
     return Uri.fromFile(File(coverPath)).toString()

@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         val navController = navHostFragment.navController
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        val bottomNavigationDivider = findViewById<android.view.View>(R.id.bottomNavigationDivider)
 
         bottomNavigation.setupWithNavController(navController)
 
@@ -27,7 +28,9 @@ class MainActivity : AppCompatActivity() {
         )
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            bottomNavigation.isVisible = destination.id in topLevelDestinations
+            val isTopLevelDestination = destination.id in topLevelDestinations
+            bottomNavigation.isVisible = isTopLevelDestination
+            bottomNavigationDivider.isVisible = isTopLevelDestination
         }
     }
 }

@@ -36,5 +36,8 @@
     <color name="create_playlist_toast_text">#FFFFFF</color>
     <color name="playlist_item_name_text">#000000</color>
     <color name="playlist_item_count_text">#6D6D71</color>
+    <color name="playlist_screen_bg">#E6E8EB</color>
+    <color name="playlist_menu_sheet_bg">#FFFFFF</color>
+    <color name="playlist_menu_text">#000000</color>
 
 </resources>

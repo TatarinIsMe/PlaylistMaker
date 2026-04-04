@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,7 +18,14 @@ class PlaylistsFragment : Fragment() {
     private val binding: FragmentPlaylistsBinding
         get() = _binding ?: error("Binding is only valid between onCreateView and onDestroyView")
 
-    private val adapter by lazy { PlaylistsAdapter() }
+    private val adapter by lazy {
+        PlaylistsAdapter { playlist ->
+            findNavController().navigate(
+                R.id.action_mediaFragment_to_playlistFragment,
+                bundleOf(ARG_PLAYLIST_ID to playlist.playlistId)
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +72,8 @@ class PlaylistsFragment : Fragment() {
     }
 
     companion object {
+        private const val ARG_PLAYLIST_ID = "playlistId"
+
         fun newInstance(): PlaylistsFragment = PlaylistsFragment()
     }
 }

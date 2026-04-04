@@ -13,7 +13,8 @@ import com.google.android.material.imageview.ShapeableImageView
 
 class TrackAdapter(
     private val items: MutableList<Track> = mutableListOf(),
-    private val onItemClick: ((Track) -> Unit)? = null
+    private val onItemClick: ((Track) -> Unit)? = null,
+    private val onItemLongClick: ((Track) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     fun submitList(newItems: List<Track>) {
@@ -34,6 +35,10 @@ class TrackAdapter(
 
         holder.itemView.setOnClickListener {
             onItemClick?.invoke(track)
+        }
+        holder.itemView.setOnLongClickListener {
+            onItemLongClick?.invoke(track)
+            onItemLongClick != null
         }
     }
 

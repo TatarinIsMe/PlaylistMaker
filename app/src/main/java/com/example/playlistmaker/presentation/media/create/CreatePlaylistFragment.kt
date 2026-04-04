@@ -20,10 +20,16 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class CreatePlaylistFragment : Fragment() {
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    private val editablePlaylistId: Long? by lazy {
+        val playlistId = arguments?.getLong(ARG_EDIT_PLAYLIST_ID, ARG_DEFAULT_PLAYLIST_ID) ?: ARG_DEFAULT_PLAYLIST_ID
+        playlistId.takeIf { it != ARG_DEFAULT_PLAYLIST_ID }
+    }
+
+    private val viewModel: CreatePlaylistViewModel by viewModel { parametersOf(editablePlaylistId) }
     private var _binding: FragmentCreatePlaylistBinding? = null
     private val binding: FragmentCreatePlaylistBinding
         get() = _binding ?: error("Binding is only valid between onCreateView and onDestroyView")
@@ -47,6 +53,11 @@ class CreatePlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (viewModel.isEditMode()) {
+            binding.tvTitle.setText(R.string.edit_playlist_title)
+            binding.btnCreate.setText(R.string.save)
+        }
 
         setupListeners()
         observeViewModel()
@@ -89,6 +100,9 @@ class CreatePlaylistFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.uiState.observe(viewLifecycleOwner, ::renderState)
         viewModel.playlistCreatedEvent.observe(viewLifecycleOwner, ::onPlaylistCreated)
+        viewModel.playlistUpdatedEvent.observe(viewLifecycleOwner) {
+            findNavController().navigateUp()
+        }
     }
 
     private fun renderState(state: CreatePlaylistUiState) {
@@ -146,6 +160,11 @@ class CreatePlaylistFragment : Fragment() {
     }
 
     private fun handleCloseRequest() {
+        if (viewModel.isEditMode()) {
+            findNavController().navigateUp()
+            return
+        }
+
         if (!viewModel.hasUnsavedData()) {
             findNavController().navigateUp()
             return
@@ -159,5 +178,10 @@ class CreatePlaylistFragment : Fragment() {
                 findNavController().navigateUp()
             }
             .show()
+    }
+
+    companion object {
+        const val ARG_EDIT_PLAYLIST_ID = "editPlaylistId"
+        private const val ARG_DEFAULT_PLAYLIST_ID = -1L
     }
 }
