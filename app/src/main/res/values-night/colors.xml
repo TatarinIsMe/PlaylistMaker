@@ -9,7 +9,26 @@
 
         <color name="colorOnSurfaceVariant">#B0B3B8</color>
         <color name="colorOutline">#2F3237</color>
+        <color name="colorSelectedBlue">#3772E7</color>
 
         <color name="colorOnSurfaceInverse">#FFFFFF</color>
         <color name="colorControlActivated">#3772E7</color>
+
+        <color name="play_icon_tint">#1A1B22</color>
+
+        <color name="create_playlist_screen_bg">#1A1B22</color>
+        <color name="create_playlist_text_primary">#FFFFFF</color>
+        <color name="create_playlist_hint">#FFFFFF</color>
+        <color name="create_playlist_input_bg">@color/create_playlist_screen_bg</color>
+        <color name="create_playlist_input_stroke">#FFFFFF</color>
+        <color name="create_playlist_placeholder_stroke">#AEAFB4</color>
+        <color name="create_playlist_placeholder_icon">#FFFFFF</color>
+        <color name="create_playlist_toast_bg">#FFFFFF</color>
+        <color name="create_playlist_toast_text">#000000</color>
+        <color name="playlist_item_name_text">#FFFFFF</color>
+        <color name="playlist_item_count_text">#FFFFFF</color>
+        <color name="playlist_screen_bg">#E6E8EB</color>
+        <color name="playlist_menu_sheet_bg">#000000</color>
+        <color name="playlist_menu_text">#FFFFFF</color>
+
 </resources>

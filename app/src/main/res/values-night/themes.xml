@@ -6,7 +6,7 @@
 
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
-        <item name="colorOnSurfaceVariant">@color/colorBackground</item>
+        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
         <item name="colorOutline">@color/colorOutline</item>
         <item name="colorOnSurfaceInverse">@color/colorOnSurfaceInverse</item>
 
@@ -16,5 +16,8 @@
     </style>
     <style name="Main.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
+    </style>
+    <style name="Test.Theme.PlaylistMaker.Search" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorOnSurfaceVariant">@color/colorSurface</item>
     </style>
 </resources>

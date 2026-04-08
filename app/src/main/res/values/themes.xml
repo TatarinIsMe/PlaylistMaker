@@ -23,6 +23,9 @@
         <item name="android:statusBarColor">@color/colorOnPrimary</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+    <style name="Test.Theme.PlaylistMaker.Search" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceInverse</item>
+    </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
 </resources>
