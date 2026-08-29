@@ -35,11 +35,9 @@
 
     <FrameLayout
         android:id="@+id/imageContainer"
-        android:layout_width="0dp"
+        android:layout_width="312dp"
         android:layout_height="312dp"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="26dp"
-        android:layout_marginEnd="24dp"
         android:background="@drawable/bg_dashed_placeholder"
         android:clickable="true"
         android:contentDescription="@string/content_desc_add_cover"

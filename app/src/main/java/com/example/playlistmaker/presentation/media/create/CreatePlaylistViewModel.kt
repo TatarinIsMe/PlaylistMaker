@@ -6,10 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.SingleLiveEvent
 import com.example.playlistmaker.domain.media.interactor.PlaylistsInteractor
+import com.example.playlistmaker.domain.model.Playlist
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class CreatePlaylistViewModel(
-    private val playlistsInteractor: PlaylistsInteractor
+    private val playlistsInteractor: PlaylistsInteractor,
+    private val editablePlaylistId: Long?
 ) : ViewModel() {
 
     private val _uiState = MutableLiveData(CreatePlaylistUiState())
@@ -17,6 +20,19 @@ class CreatePlaylistViewModel(
 
     private val _playlistCreatedEvent = SingleLiveEvent<String>()
     val playlistCreatedEvent: LiveData<String> = _playlistCreatedEvent
+
+    private val _playlistUpdatedEvent = SingleLiveEvent<Unit>()
+    val playlistUpdatedEvent: LiveData<Unit> = _playlistUpdatedEvent
+
+    private var editablePlaylist: Playlist? = null
+
+    init {
+        if (isEditMode()) {
+            loadEditablePlaylist()
+        }
+    }
+
+    fun isEditMode(): Boolean = editablePlaylistId != null
 
     fun onNameChanged(name: String) {
         updateState { state ->
@@ -50,15 +66,45 @@ class CreatePlaylistViewModel(
             updateState { current -> current.copy(isSaving = true) }
 
             runCatching {
-                playlistsInteractor.createPlaylist(
-                    name = name,
-                    description = state.description.trim().takeIf { it.isNotEmpty() },
-                    coverUri = state.coverUri
-                )
+                if (isEditMode()) {
+                    val playlist = editablePlaylist ?: error("Editable playlist is not loaded yet")
+                    playlistsInteractor.updatePlaylist(
+                        playlist.copy(
+                            name = name,
+                            description = state.description.trim().takeIf { it.isNotEmpty() },
+                            coverUri = state.coverUri
+                        )
+                    )
+                } else {
+                    playlistsInteractor.createPlaylist(
+                        name = name,
+                        description = state.description.trim().takeIf { it.isNotEmpty() },
+                        coverUri = state.coverUri
+                    )
+                }
             }.onSuccess {
-                _playlistCreatedEvent.value = name
+                if (isEditMode()) {
+                    _playlistUpdatedEvent.value = Unit
+                } else {
+                    _playlistCreatedEvent.value = name
+                }
             }.onFailure {
                 updateState { current -> current.copy(isSaving = false) }
+            }
+        }
+    }
+
+    private fun loadEditablePlaylist() {
+        val playlistId = editablePlaylistId ?: return
+        viewModelScope.launch {
+            val playlist = playlistsInteractor.getPlaylistById(playlistId).first() ?: return@launch
+            editablePlaylist = playlist
+            updateState { state ->
+                state.copy(
+                    name = playlist.name,
+                    description = playlist.description.orEmpty(),
+                    coverUri = playlist.coverUri
+                )
             }
         }
     }
