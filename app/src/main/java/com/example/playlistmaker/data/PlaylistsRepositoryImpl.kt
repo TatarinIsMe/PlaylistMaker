@@ -1,5 +1,9 @@
 package com.example.playlistmaker.data
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
@@ -31,10 +35,8 @@ class PlaylistsRepositoryImpl(
 ) : PlaylistsRepository {
 
     override suspend fun createPlaylist(name: String, description: String?, coverUri: String?): Long {
-        val savedCoverPath = coverUri?.let { uri ->
-            withContext(Dispatchers.IO) {
-                saveCoverToPrivateStorage(Uri.parse(uri))
-            }
+        val savedCoverPath = withContext(Dispatchers.IO) {
+            resolveCoverPath(coverUri)
         }
 
         val playlist = PlaylistEntity(
@@ -50,8 +52,9 @@ class PlaylistsRepositoryImpl(
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {
-        val playlistEntity = playlist.toEntity()
         withContext(Dispatchers.IO) {
+            val savedCoverPath = resolveCoverPath(playlist.coverUri)
+            val playlistEntity = playlist.toEntity().copy(coverPath = savedCoverPath)
             playlistDao.updatePlaylist(playlistEntity)
         }
     }
@@ -117,6 +120,16 @@ class PlaylistsRepositoryImpl(
         }
     }
 
+    private fun resolveCoverPath(coverUri: String?): String? {
+        if (coverUri.isNullOrBlank()) return null
+        val uri = runCatching { Uri.parse(coverUri) }.getOrNull() ?: return coverUri
+        return when (uri.scheme) {
+            "file" -> uri.path ?: coverUri
+            null, "" -> coverUri
+            else -> saveCoverToPrivateStorage(uri)
+        }
+    }
+
     private fun saveCoverToPrivateStorage(imageUri: Uri): String? {
         return runCatching {
             val coversDir = File(context.filesDir, PLAYLIST_COVERS_DIR)
@@ -134,8 +147,45 @@ class PlaylistsRepositoryImpl(
                 }
             } ?: return null
 
+            normalizeImageOrientation(destinationFile)
+
             destinationFile.absolutePath
         }.getOrNull()
+    }
+
+    private fun normalizeImageOrientation(imageFile: File) {
+        val exif = ExifInterface(imageFile.absolutePath)
+        val rotationDegrees = when (
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        ) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> return
+        }
+
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath) ?: return
+        val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
+        val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        if (rotatedBitmap != bitmap) {
+            bitmap.recycle()
+        }
+
+        FileOutputStream(imageFile).use { outputStream ->
+            val format = when (imageFile.extension.lowercase()) {
+                "png" -> Bitmap.CompressFormat.PNG
+                "webp" -> Bitmap.CompressFormat.WEBP
+                else -> Bitmap.CompressFormat.JPEG
+            }
+            val quality = if (format == Bitmap.CompressFormat.PNG) 100 else 90
+            rotatedBitmap.compress(format, quality, outputStream)
+        }
+        rotatedBitmap.recycle()
+
+        ExifInterface(imageFile.absolutePath).apply {
+            setAttribute(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL.toString())
+            saveAttributes()
+        }
     }
 
     private fun resolveFileExtension(imageUri: Uri): String {
